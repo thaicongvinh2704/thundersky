@@ -2051,3 +2051,72 @@ Neu muon mo rong manh, nen uu tien:
 3. Them leaderboard portal API neu can submit.
 4. Cai thien audio bang asset rieng hop phap.
 5. Them settings/do kho va polish UI.
+
+## 32. Tinh Trang Game Hien Tai
+
+Cap nhat ngay 07/06/2026:
+
+### Trang Thai Source Va Gameplay
+
+- Source phat trien nam trong `src/` va `styles/`.
+- Ban phat hanh standalone hien co la `index.html` va `Sky-Thunder-Play.html`.
+- Hai file standalone co cung noi dung build va co the chay truc tiep tren trinh duyet.
+- Game da co day du flow chinh: menu, Hangar, Stage 1-5, boss, upgrade, pause, game over, victory va Endless Mode.
+- Cac he thong chinh da co: 5 ship, nhieu weapon, weapon level, Thunder Skill, combo, synergy, power-up, mini boss, credits, save local, audio va mobile control.
+- Mobile da co HUD rieng, drag control, safe area, gioi han DPR/object va cac tuy chinh hieu nang.
+- Build standalone gan nhat da duoc tao thanh cong bang `tools/build-standalone.js`.
+
+### Trang Thai GitHub
+
+- Repository: `https://github.com/thaicongvinh2704/thundersky.git`
+- Branch chinh: `main`.
+- Source da duoc commit va push len GitHub.
+- Commit khoi tao source: `cda8dbd`.
+- Commit them cau hinh deploy cPanel: `bf89a82`.
+- File `.cpanel.yml` da co trong repository.
+
+### Trang Thai Deploy cPanel
+
+- Repository tren cPanel duoc clone tai:
+
+```text
+/home/mgffglfc/repositories/thundersky-game
+```
+
+- Thu muc website dich:
+
+```text
+/home/mgffglfc/public_html/
+```
+
+- `.cpanel.yml` hien deploy file `index.html` vao `public_html`.
+- cPanel can checkout commit moi nhat co `.cpanel.yml` truoc khi nut `Deploy HEAD Commit` hoat dong.
+- Quy trinh deploy:
+  1. Vao cPanel `Git Version Control`.
+  2. Mo repository `thundersky-game`.
+  3. Chon `Pull or Deploy`.
+  4. Bam `Update from Remote`.
+  5. Kiem tra HEAD da la commit moi nhat.
+  6. Bam `Deploy HEAD Commit`.
+- Neu cPanel van bao `uncommitted changes`, can kiem tra file bi thay doi trong repository tren server hoac clone lai repository vao mot thu muc rong moi.
+- Tai thoi diem cap nhat bao cao, cau hinh deploy da san sang trong GitHub; viec deploy thanh cong tren hosting van can duoc xac nhan tren cPanel.
+
+### Kiem Thu Con Can Lam
+
+- Xac nhan domain mo dung game sau khi deploy.
+- Kiem tra `index.html` khong bi cache ban cu.
+- Playtest day du Stage 1-5 va Endless tren desktop.
+- Playtest Android Chrome va iPhone Safari that.
+- Kiem tra pause, sound, save, Hangar va Thunder khi chay tren domain.
+- Theo doi FPS va object count trong Endless tren mobile.
+- Can bang tiep Thunder Hunter, boss, combo, credits va ti le drop sau playtest.
+
+### Quy Uoc Cap Nhat Bao Cao
+
+Sau moi dot hoan thanh tinh nang, sua loi, build hoac deploy, can cap nhat file nay voi:
+
+- Ngay cap nhat.
+- Cac file va he thong da thay doi.
+- Lenh build/test da chay va ket qua.
+- Trang thai commit/push/deploy.
+- Cac loi, rui ro hoac viec con lai can kiem tra.
