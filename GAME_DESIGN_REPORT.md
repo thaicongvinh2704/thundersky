@@ -2261,3 +2261,26 @@ Cap nhat ngay 07/06/2026 theo yeu cau trong file TXT ve loi double tap/pinch zoo
 - iPhone Safari: double tap canvas, double tap Thunder/Pause/Sound/Language, pinch 2 ngon, keo may bay lien tuc, xoay ngang/doc, cho address bar co/dan.
 - Android Chrome: test cac case tuong tu.
 - Xac nhan canvas luon full man hinh, khong bi thu nho/lẹch trai, khong co khoang den ben phai, nut Thunder khong phong to bat thuong.
+
+## 36. Hotfix Nut Thunder Mobile Sau Khi Khoa Zoom
+
+Cap nhat ngay 07/06/2026 sau khi phat hien mobile khong bam duoc nut Bao Sam.
+
+### Nguyen Nhan
+
+- Lop guard chong zoom moi bat su kien `pointerdown/touchstart` o capture phase cho tat ca button, nen tren mot so browser mobile click cua nut Thunder co the khong den handler rieng.
+- HUD set `disabled` that cho nut Thunder khi chua ready, lam mobile Safari de bo qua touch/click va khong hien feedback khi nguoi choi bam.
+
+### Da Sua
+
+- `src/ui/Hud.js`: nut Thunder khong con bi `disabled` that; dung `aria-disabled` de bao trang thai nhung van nhan touch.
+- `src/core/Game.js`: neu touch/pointer vao `#skillBtn`, guard se goi `activateThunder()` truc tiep khi dang choi, hoac request skill neu chua vao gameplay.
+- Them debounce ngan cho nut Thunder de tranh pointer/touch kich hoat lap hai lan.
+- Build lai `index.html` va `Sky-Thunder-Play.html`.
+
+### Test Da Chay
+
+- `node --check src/core/Game.js`: pass.
+- `node --check src/ui/Hud.js`: pass.
+- `node --check tools/build-standalone.js`: pass.
+- `node tools/build-standalone.js`: pass.

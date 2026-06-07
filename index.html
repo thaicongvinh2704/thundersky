@@ -3924,7 +3924,8 @@ class Hud {
     }
     if (this.elements.skillButton) {
       const ready = player.energy >= 100 && player.thunderCooldown <= 0;
-      this.elements.skillButton.disabled = !ready;
+      this.elements.skillButton.disabled = false;
+      this.elements.skillButton.setAttribute("aria-disabled", String(!ready));
       this.elements.skillButton.textContent = ready ? t("controls.thunder") : player.thunderCooldown > 0 ? `${player.thunderCooldown.toFixed(1)}s` : `${Math.floor(player.energy)}%`;
       this.elements.skillButton.classList.toggle("ready", ready);
     }
@@ -4216,6 +4217,7 @@ class Game {
     this.gameOverScreen = new GameOverScreen(this.menu);
     this.lang = getLanguage();
     this.lastTouchEnd = 0;
+    this.lastSkillButtonTouch = 0;
   }
 
   init() {
@@ -4388,10 +4390,27 @@ class Game {
       ".pause-action"
     ].join(",");
     const isGuarded = (target) => target instanceof Element && target.closest(selector);
+    const triggerGuardedButton = (target) => {
+      const element = target instanceof Element ? target : null;
+      const button = element?.closest("button");
+      if (!button || button.disabled) return;
+      if (button === this.hud.elements.skillButton) {
+        const now = performance.now();
+        if (now - this.lastSkillButtonTouch < 180) return;
+        this.lastSkillButtonTouch = now;
+        if (this.state.is(STATES.PLAYING) || this.state.is(STATES.BOSS) || this.state.is(STATES.ENDLESS)) this.activateThunder();
+        else this.input.requestSkill();
+        return;
+      }
+      button.click();
+    };
     document.addEventListener("pointerdown", (event) => {
       if (!isGuarded(event.target)) return;
       event.preventDefault();
       event.stopPropagation();
+      if (event.pointerType === "touch" && event.target instanceof Element && event.target.closest("#skillBtn")) {
+        triggerGuardedButton(event.target);
+      }
     }, { passive: false, capture: true });
     document.addEventListener("touchstart", (event) => {
       if (!isGuarded(event.target)) return;
@@ -4402,8 +4421,7 @@ class Game {
       if (!isGuarded(event.target)) return;
       event.preventDefault();
       event.stopPropagation();
-      const button = event.target.closest("button");
-      if (button && !button.disabled) button.click();
+      triggerGuardedButton(event.target);
     }, { passive: false, capture: true });
     document.addEventListener("click", (event) => {
       if (isGuarded(event.target)) event.stopPropagation();

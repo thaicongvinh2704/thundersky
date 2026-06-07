@@ -73,6 +73,7 @@ export class Game {
     this.gameOverScreen = new GameOverScreen(this.menu);
     this.lang = getLanguage();
     this.lastTouchEnd = 0;
+    this.lastSkillButtonTouch = 0;
   }
 
   init() {
@@ -245,10 +246,27 @@ export class Game {
       ".pause-action"
     ].join(",");
     const isGuarded = (target) => target instanceof Element && target.closest(selector);
+    const triggerGuardedButton = (target) => {
+      const element = target instanceof Element ? target : null;
+      const button = element?.closest("button");
+      if (!button || button.disabled) return;
+      if (button === this.hud.elements.skillButton) {
+        const now = performance.now();
+        if (now - this.lastSkillButtonTouch < 180) return;
+        this.lastSkillButtonTouch = now;
+        if (this.state.is(STATES.PLAYING) || this.state.is(STATES.BOSS) || this.state.is(STATES.ENDLESS)) this.activateThunder();
+        else this.input.requestSkill();
+        return;
+      }
+      button.click();
+    };
     document.addEventListener("pointerdown", (event) => {
       if (!isGuarded(event.target)) return;
       event.preventDefault();
       event.stopPropagation();
+      if (event.pointerType === "touch" && event.target instanceof Element && event.target.closest("#skillBtn")) {
+        triggerGuardedButton(event.target);
+      }
     }, { passive: false, capture: true });
     document.addEventListener("touchstart", (event) => {
       if (!isGuarded(event.target)) return;
@@ -259,8 +277,7 @@ export class Game {
       if (!isGuarded(event.target)) return;
       event.preventDefault();
       event.stopPropagation();
-      const button = event.target.closest("button");
-      if (button && !button.disabled) button.click();
+      triggerGuardedButton(event.target);
     }, { passive: false, capture: true });
     document.addEventListener("click", (event) => {
       if (isGuarded(event.target)) event.stopPropagation();

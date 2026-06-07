@@ -36,7 +36,8 @@ export class Hud {
     }
     if (this.elements.skillButton) {
       const ready = player.energy >= 100 && player.thunderCooldown <= 0;
-      this.elements.skillButton.disabled = !ready;
+      this.elements.skillButton.disabled = false;
+      this.elements.skillButton.setAttribute("aria-disabled", String(!ready));
       this.elements.skillButton.textContent = ready ? t("controls.thunder") : player.thunderCooldown > 0 ? `${player.thunderCooldown.toFixed(1)}s` : `${Math.floor(player.energy)}%`;
       this.elements.skillButton.classList.toggle("ready", ready);
     }
