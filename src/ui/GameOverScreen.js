@@ -1,23 +1,25 @@
+import { t } from "../data/i18n.js";
+
 export class GameOverScreen {
   constructor(menu) {
     this.menu = menu;
   }
 
   show(game) {
-    this.menu.show("Het Tran", this.summary(game, "Phi doi dich van con tren bau troi."), "Choi lai");
+    this.menu.show(t("game.over"), `${t("game.overLine")} ${this.summary(game)}`, t("game.playAgain"));
   }
 
   win(game) {
-    this.menu.show("Victory", this.summary(game, "Ban da ha boss cuoi. Tiep tuc Endless de san diem cao hon."), "Continue Endless", false, "Restart");
+    this.menu.show(t("game.victory"), `${t("game.victoryLine")} ${this.summary(game)}`, t("game.continueEndless"), false, t("common.restart"));
   }
 
   paused(game) {
-    this.menu.showPause("Resume de quay lai tran chien. Controls se hien phim va chuot dang ho tro.", game.audio.muted);
+    this.menu.showPause(t("pause.help"), game.audio.muted);
     this.menu.showPauseControls();
   }
 
-  summary(game, line) {
+  summary(game) {
     const endless = game.stats.endlessTime ? ` Endless: ${Math.floor(game.stats.endlessTime)}s. Best endless: ${Math.floor(game.save.best.endlessTime || 0)}s.` : "";
-    return `${line} Score: ${game.score}. Best: ${game.save.best.score || 0}. Stage reached: ${game.stats.stageReached}. Enemies destroyed: ${game.stats.enemiesDestroyed}. Max combo: x${(game.stats.maxCombo || 1).toFixed(2)}.${endless}`;
+    return `${t("game.summary", { score: game.score, best: game.save.best.score || 0, stage: game.stats.stageReached, kills: game.stats.enemiesDestroyed, combo: (game.stats.maxCombo || 1).toFixed(2) })}${endless}`;
   }
 }

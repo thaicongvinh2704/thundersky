@@ -143,6 +143,74 @@
   pointer-events: auto;
 }
 
+.control-dock {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 6;
+  display: grid;
+  gap: 6px;
+  width: 210px;
+  padding: 10px;
+  color: #dff7ff;
+  background: rgba(5, 16, 29, 0.66);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 8px;
+  opacity: 0.64;
+  transition: opacity 160ms ease;
+}
+
+.control-dock:hover,
+body:has(.pause-mode) .control-dock {
+  opacity: 1;
+}
+
+.control-dock div,
+.control-dock button {
+  display: grid;
+  grid-template-columns: 92px 1fr;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  min-height: 28px;
+  padding: 0;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  text-align: left;
+  font: 700 11px/1.2 Arial, sans-serif;
+}
+
+.control-dock button {
+  cursor: pointer;
+}
+
+.control-dock kbd {
+  padding: 5px 6px;
+  color: #071426;
+  background: #dff7ff;
+  border-radius: 4px;
+  font: 800 10px/1 Arial, sans-serif;
+  text-align: center;
+}
+
+.language-button {
+  position: fixed;
+  right: 18px;
+  bottom: 146px;
+  z-index: 7;
+  min-width: 74px;
+  height: 38px;
+  padding: 0 10px;
+  color: #dff7ff;
+  background: rgba(5, 16, 29, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 7px;
+  font-size: 11px;
+  font-weight: 800;
+}
+
 .mute-button {
   right: 18px;
   bottom: 18px;
@@ -346,6 +414,35 @@ body.is-mobile .pause-button {
   min-width: 58px;
   height: 52px;
   font-size: 14px;
+}
+
+body.is-mobile .control-dock {
+  display: none;
+}
+
+body.is-mobile .language-button {
+  right: auto;
+  left: max(10px, env(safe-area-inset-left));
+  bottom: calc(max(12px, env(safe-area-inset-bottom)) + 50px);
+  min-width: 58px;
+}
+
+@media (min-width: 761px) {
+  .pause-button {
+    display: none;
+  }
+}
+
+@media (max-width: 980px) and (min-width: 761px) {
+  .control-dock {
+    width: 176px;
+  }
+
+  .control-dock div,
+  .control-dock button {
+    grid-template-columns: 78px 1fr;
+    font-size: 10px;
+  }
 }
 
 body.is-mobile .skill-button {

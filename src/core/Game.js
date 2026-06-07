@@ -7,6 +7,7 @@ import { PowerUp } from "../entities/PowerUp.js";
 import { WEAPON_DROP_IDS } from "../data/weapons.js";
 import { BALANCE } from "../data/balance.js";
 import { SHIPS, getShip } from "../data/ships.js";
+import { getLanguage, t, toggleLanguage } from "../data/i18n.js";
 import { SpawnSystem } from "../systems/SpawnSystem.js";
 import { StageSystem } from "../systems/StageSystem.js";
 import { UpgradeSystem } from "../systems/UpgradeSystem.js";
@@ -39,7 +40,9 @@ export class Game {
     this.stats = { enemiesDestroyed: 0, stageReached: 1, maxCombo: 1, endlessTime: 0, stageHits: 0, totalHits: 0, bossTime: 0, stageKills: 0, stageDamageTaken: 0, creditsEarned: 0 };
     this.combo = { count: 0, multiplier: 1, timer: 0, maxTimer: 3.2 };
     this.endless = { active: false, time: 0, multiplier: 1, survivalBonusTimer: 0 };
-    this.debug = { visible: false, fps: 0, frames: 0, elapsed: 0 };
+    this.debug = { visible: false, fps: 60, frames: 0, elapsed: 0 };
+    this.performanceTier = "normal";
+    this.performanceSamples = { low: 0, critical: 0, recovery: 0 };
     this.stageResult = null;
     this.mobile = false;
     this.layout = {
@@ -65,6 +68,7 @@ export class Game {
     this.menu = new Menu(menu);
     this.upgradeScreen = new UpgradeScreen(menu);
     this.gameOverScreen = new GameOverScreen(this.menu);
+    this.lang = getLanguage();
   }
 
   init() {
@@ -81,6 +85,7 @@ export class Game {
     this.input.onPause = () => this.togglePause();
     this.input.onDebug = () => this.toggleDebug();
     this.input.bind();
+    this.input.setViewportProvider(() => ({ width: this.width, height: this.height }));
     this.audio.bind();
     if (this.hud.elements.skillButton) {
       this.hud.elements.skillButton.addEventListener("pointerdown", (event) => event.stopPropagation());
@@ -96,6 +101,18 @@ export class Game {
         this.togglePause();
       });
     }
+    if (this.hud.elements.dockPauseButton) {
+      this.hud.elements.dockPauseButton.addEventListener("pointerdown", (event) => event.stopPropagation());
+      this.hud.elements.dockPauseButton.addEventListener("click", () => this.togglePause());
+    }
+    if (this.hud.elements.languageButton) {
+      this.hud.elements.languageButton.addEventListener("pointerdown", (event) => event.stopPropagation());
+      this.hud.elements.languageButton.addEventListener("click", () => {
+        this.lang = toggleLanguage();
+        this.refreshLanguage();
+      });
+    }
+    window.addEventListener("skythunderlanguagechange", () => this.refreshLanguage());
     this.menu.bindStart(() => {
       if (this.state.is(STATES.PAUSED)) this.resume();
       else if (this.state.is(STATES.WIN)) this.continueEndless();
@@ -115,6 +132,7 @@ export class Game {
       mainMenu: () => this.returnToMenu()
     });
     this.menu.showMenu();
+    this.refreshLanguage();
     this.audio.startMusic("menu");
     if (new URLSearchParams(window.location.search).get("debug") === "1") this.toggleDebug();
     this.renderer.render(0);
@@ -122,7 +140,10 @@ export class Game {
 
   resize() {
     this.updateMobileState();
-    const cap = this.mobile ? (this.debug.fps && this.debug.fps < BALANCE.mobile.lowFpsThreshold ? BALANCE.mobile.lowFpsDprCap : BALANCE.mobile.dprCap) : 2;
+    const caps = this.mobile
+      ? { normal: 1.35, low: 1.15, critical: 1 }
+      : { normal: 1.75, low: 1.35, critical: 1.15 };
+    const cap = caps[this.performanceTier];
     this.dpr = Math.min(window.devicePixelRatio || 1, cap);
     const viewport = window.visualViewport;
     this.width = Math.max(1, Math.floor(viewport?.width || window.innerWidth));
@@ -178,7 +199,7 @@ export class Game {
     document.body.classList.toggle("is-landscape", this.mobile && landscape);
     document.body.classList.toggle("is-small-phone", this.mobile && tiny);
     this.input.setMobile(this.mobile);
-    this.effects.maxParticles = this.mobile ? mobile.maxParticles : 280;
+    this.effects.maxParticles = this.getPerformanceLimits().particles;
   }
 
   start() {
@@ -302,11 +323,35 @@ export class Game {
   }
 
   enforceSoftCaps() {
-    if (this.playerBullets.length > 180) this.playerBullets.splice(0, this.playerBullets.length - 180);
-    const enemyBulletCap = this.mobile ? BALANCE.mobile.enemyBulletCap : 260;
-    const powerUpCap = this.mobile ? BALANCE.mobile.powerUpCap : 24;
-    if (this.enemyBullets.length > enemyBulletCap) this.enemyBullets.splice(0, this.enemyBullets.length - enemyBulletCap);
-    if (this.powerUps.length > powerUpCap) this.powerUps.splice(0, this.powerUps.length - powerUpCap);
+    const limits = this.getPerformanceLimits();
+    this.trimOldest(this.playerBullets, limits.playerBullets);
+    this.trimOldest(this.enemyBullets, limits.enemyBullets);
+    this.trimOldest(this.powerUps, limits.powerUps);
+    this.trimOldest(this.enemies, limits.enemies);
+    this.trimOldest(this.effects.particles, limits.particles);
+  }
+
+  trimOldest(items, cap) {
+    if (items.length <= cap) return;
+    const excess = items.length - cap;
+    items.splice(0, excess);
+  }
+
+  getPerformanceLimits() {
+    const desktop = {
+      normal: { playerBullets: 160, enemyBullets: 220, particles: 200, powerUps: 16, enemies: 34 },
+      low: { playerBullets: 130, enemyBullets: 180, particles: 140, powerUps: 12, enemies: 28 },
+      critical: { playerBullets: 100, enemyBullets: 140, particles: 90, powerUps: 10, enemies: 22 }
+    };
+    const limits = { ...desktop[this.performanceTier] };
+    if (this.mobile) {
+      for (const key of Object.keys(limits)) limits[key] = Math.max(8, Math.floor(limits[key] * 0.8));
+    }
+    return limits;
+  }
+
+  getEffectScale() {
+    return this.performanceTier === "critical" ? 0.18 : this.performanceTier === "low" ? 0.42 : 1;
   }
 
   checkCollisions() {
@@ -365,32 +410,32 @@ export class Game {
       const id = powerUp.type.slice(7);
       const sameWeapon = player.weapon.id === id;
       player.setWeapon(id);
-      this.warn(sameWeapon ? `${player.weapon.name.toUpperCase()} LEVEL UP!` : `SWITCHED TO ${player.weapon.name.toUpperCase()}`);
+      this.warn(t(sameWeapon ? "power.levelUp" : "power.switch", { weapon: player.weapon.name.toUpperCase() }));
       return;
     }
     if (powerUp.type === "repair") {
       player.health = Math.min(player.maxHealth, player.health + 18);
-      this.effects.message("REPAIR +18");
+      this.effects.message(t("power.repair"));
       return;
     }
     if (powerUp.type === "shield") {
       player.shields += 1;
-      this.effects.message("SHIELD +1");
+      this.effects.message(t("power.shield"));
       return;
     }
     if (powerUp.type === "bomb") {
       this.bombBlast();
-      this.warn("BOMB BLAST");
+      this.warn(t("power.bomb"));
       return;
     }
     if (powerUp.type === "rapid") {
       player.rapidTimer = Math.max(player.rapidTimer, 6);
-      this.effects.message("RAPID FIRE");
+      this.effects.message(t("power.rapid"));
       return;
     }
     if (powerUp.type === "magnet") {
       player.magnetTimer = Math.max(player.magnetTimer, 5);
-      this.effects.message("MAGNET ON");
+      this.effects.message(t("power.magnet"));
       return;
     }
     const gain = BALANCE.thunder.chargePerPickup * (1 + player.stats.thunderCharge);
@@ -596,15 +641,18 @@ export class Game {
   updateDebug(dt) {
     this.debug.frames += 1;
     this.debug.elapsed += dt;
-    if (this.debug.elapsed >= 0.5) {
+    if (this.debug.elapsed >= 1.2) {
       this.debug.fps = Math.round(this.debug.frames / this.debug.elapsed);
       this.debug.frames = 0;
       this.debug.elapsed = 0;
+      this.updatePerformanceTier();
     }
     const overlay = this.hud.elements.debugOverlay;
     if (!overlay || !this.debug.visible) return;
     overlay.textContent = [
       `FPS ${this.debug.fps}`,
+      `Tier ${this.performanceTier}`,
+      `DPR ${this.dpr.toFixed(2)}`,
       `State ${this.state.state}`,
       `Enemies ${this.enemies.length}`,
       `P Bullets ${this.playerBullets.length}`,
@@ -613,6 +661,34 @@ export class Game {
       `PowerUps ${this.powerUps.length}`,
       `Endless ${Math.floor(this.endless.time)}s`
     ].join("\n");
+  }
+
+  updatePerformanceTier() {
+    const fps = this.debug.fps;
+    this.performanceSamples.critical = fps < 35 ? this.performanceSamples.critical + 1 : 0;
+    this.performanceSamples.low = fps < 45 ? this.performanceSamples.low + 1 : 0;
+    this.performanceSamples.recovery = fps >= 55 ? this.performanceSamples.recovery + 1 : 0;
+    let next = this.performanceTier;
+    if (this.performanceSamples.critical >= 2) next = "critical";
+    else if (this.performanceSamples.low >= 3 && this.performanceTier === "normal") next = "low";
+    else if (this.performanceSamples.recovery >= 3) next = this.performanceTier === "critical" ? "low" : "normal";
+    if (next !== this.performanceTier) {
+      this.performanceTier = next;
+      this.effects.maxParticles = this.getPerformanceLimits().particles;
+      this.resizeSoon();
+    }
+  }
+
+  refreshLanguage() {
+    this.lang = getLanguage();
+    if (this.state.is(STATES.MENU)) this.menu.showMenu();
+    else if (this.state.is(STATES.PAUSED)) this.gameOverScreen.paused(this);
+    else if (this.state.is(STATES.WIN)) this.gameOverScreen.win(this);
+    else if (this.state.is(STATES.GAME_OVER)) this.gameOverScreen.show(this);
+    if (this.hud.elements.languageButton) this.hud.elements.languageButton.textContent = this.lang === "vi" ? "VI | EN" : "EN | VI";
+    if (this.hud.elements.orientationHint) this.hud.elements.orientationHint.textContent = t("orientation");
+    for (const label of document.querySelectorAll("[data-i18n]")) label.textContent = t(label.dataset.i18n);
+    this.hud.update(this);
   }
 
   activateThunder() {

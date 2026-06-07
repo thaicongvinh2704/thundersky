@@ -35,7 +35,7 @@ export class Renderer {
     ctx.fillRect(0, 0, game.width, game.height);
 
     ctx.save();
-    ctx.globalCompositeOperation = game.mobile ? "source-over" : "screen";
+    ctx.globalCompositeOperation = game.mobile || game.performanceTier !== "normal" ? "source-over" : "screen";
     for (const star of game.effects.stars) {
       const alpha = 0.32 + Math.sin(star.twinkle) * 0.18;
       ctx.fillStyle = `rgba(190,239,255,${alpha})`;
@@ -51,7 +51,7 @@ export class Renderer {
     ctx.globalAlpha = 0.22;
     ctx.strokeStyle = "#76d8ff";
     ctx.lineWidth = 1;
-    const streaks = game.mobile ? 5 : 9;
+    const streaks = Math.max(2, Math.ceil((game.mobile ? 5 : 9) * game.getEffectScale()));
     for (let i = 0; i < streaks; i++) {
       const x = ((time * 0.035 + i * 170) % (game.width + 220)) - 110;
       ctx.beginPath();
@@ -78,14 +78,14 @@ export class Renderer {
   drawLightnings() {
     const { ctx, game } = this;
     ctx.save();
-    ctx.globalCompositeOperation = "lighter";
+    ctx.globalCompositeOperation = game.performanceTier === "critical" ? "source-over" : "lighter";
     for (const bolt of game.effects.lightnings) {
       const alpha = Math.max(0, bolt.life / bolt.maxLife);
       ctx.globalAlpha = alpha;
       ctx.strokeStyle = "#bdf7ff";
       ctx.lineWidth = bolt.width;
       ctx.shadowColor = "#77e7ff";
-      ctx.shadowBlur = game.mobile ? 8 : 18;
+      ctx.shadowBlur = (game.mobile ? 8 : 18) * game.getEffectScale();
       ctx.beginPath();
       ctx.moveTo(bolt.x1, bolt.y1);
       const dx = bolt.x2 - bolt.x1;
@@ -115,7 +115,7 @@ export class Renderer {
       const y = game.height * 0.2 + i * 34 - (1 - alpha) * 18;
       ctx.globalAlpha = alpha;
       ctx.shadowColor = "rgba(255,225,120,0.9)";
-      ctx.shadowBlur = game.mobile ? 8 : 18;
+      ctx.shadowBlur = (game.mobile ? 8 : 18) * game.getEffectScale();
       ctx.fillStyle = "#fff3a6";
       ctx.fillText(message.text, game.width / 2, y);
     }

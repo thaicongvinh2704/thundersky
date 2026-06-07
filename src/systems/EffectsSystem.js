@@ -25,7 +25,7 @@ export class EffectsSystem {
 
   makeStars() {
     this.stars.length = 0;
-    const scale = this.game.mobile ? BALANCE.mobile.starScale : 1;
+    const scale = (this.game.mobile ? BALANCE.mobile.starScale : 1) * this.game.getEffectScale();
     const count = Math.floor((this.game.width * this.game.height * scale) / 9000);
     for (let i = 0; i < count; i++) {
       this.stars.push({
@@ -38,7 +38,7 @@ export class EffectsSystem {
   }
 
   burst(x, y, color, count, speed, life) {
-    const particleCount = this.game.mobile ? Math.ceil(count * 0.64) : count;
+    const particleCount = Math.max(1, Math.ceil((this.game.mobile ? count * 0.64 : count) * this.game.getEffectScale()));
     const particleSpeed = this.game.mobile ? speed * 0.86 : speed;
     for (let i = 0; i < particleCount; i++) {
       if (this.particles.length >= this.maxParticles) this.particles.shift();
@@ -77,7 +77,7 @@ export class EffectsSystem {
       });
       this.burst(target.x, target.y, "#bdf7ff", 10, 170, 0.38);
     }
-    const boltCount = this.game.mobile ? 5 : 10;
+    const boltCount = Math.max(2, Math.ceil((this.game.mobile ? 5 : 10) * this.game.getEffectScale()));
     for (let i = 0; i < boltCount; i++) {
       const angle = (Math.PI * 2 * i) / boltCount;
       this.lightnings.push({
@@ -97,7 +97,8 @@ export class EffectsSystem {
   update(dt) {
     this.cloudTimer -= dt;
     if (this.cloudTimer <= 0) {
-      if (!this.game.mobile || this.clouds.length < BALANCE.mobile.cloudCap) {
+      const cloudCap = Math.max(2, Math.ceil((this.game.mobile ? BALANCE.mobile.cloudCap : 14) * this.game.getEffectScale()));
+      if (this.clouds.length < cloudCap) {
         const scale = this.game.mobile ? BALANCE.mobile.cloudScale : 1;
         this.clouds.push({
           x: -120 + Math.random() * (this.game.width + 240),

@@ -1,18 +1,20 @@
+import { t } from "../data/i18n.js";
+
 export class Menu {
   constructor(elements) {
     this.elements = elements;
     this.startHandler = null;
     this.defaultStartHandler = null;
-    this.hangarButton = this.makeActionButton("Hangar");
+    this.hangarButton = this.makeActionButton(t("menu.hangar"));
     this.hangarButton.className = "hangar-button";
     this.elements.startButton.insertAdjacentElement("afterend", this.hangarButton);
     this.pauseActions = document.createElement("div");
     this.pauseActions.className = "pause-actions hidden";
-    this.resumeButton = this.makeActionButton("Resume", "primary");
-    this.restartButton = this.makeActionButton("Restart");
-    this.soundButton = this.makeActionButton("Sound");
-    this.controlsButton = this.makeActionButton("Controls");
-    this.mainMenuButton = this.makeActionButton("Main Menu");
+    this.resumeButton = this.makeActionButton(t("pause.resume"), "primary");
+    this.restartButton = this.makeActionButton(t("common.restart"));
+    this.soundButton = this.makeActionButton(t("common.soundOn"));
+    this.controlsButton = this.makeActionButton(t("controls.controls"));
+    this.mainMenuButton = this.makeActionButton(t("common.mainMenu"));
     this.pauseActions.append(this.resumeButton, this.restartButton, this.soundButton, this.controlsButton, this.mainMenuButton);
     this.elements.startButton.insertAdjacentElement("beforebegin", this.pauseActions);
   }
@@ -50,12 +52,13 @@ export class Menu {
   }
 
   setSoundLabel(muted) {
-    this.soundButton.textContent = muted ? "Sound Off" : "Sound On";
+    this.soundButton.textContent = t(muted ? "common.soundOff" : "common.soundOn");
   }
 
   showMenu() {
     this.startHandler = this.defaultStartHandler;
-    this.show("Sky Thunder", "Song sot qua cac wave, gom nang luong va kich hoat Thunder Storm khi day pin.", "Bat dau", true);
+    this.show("Sky Thunder", t("menu.intro"), t("menu.start"), true);
+    this.hangarButton.textContent = t("menu.hangar");
   }
 
   show(title, text, buttonText, showControls = false, secondaryText = "") {
@@ -80,10 +83,10 @@ export class Menu {
   showHangar({ ships, save, onSelect, onBack }) {
     this.elements.overlay.classList.remove("hidden");
     this.elements.overlay.classList.remove("pause-mode");
-    this.elements.title.textContent = "Hangar";
-    this.elements.text.textContent = `Credits ${save.best.credits || 0} | Choose your fighter`;
+    this.elements.title.textContent = t("hangar.title");
+    this.elements.text.textContent = `${t("hangar.credits")} ${save.best.credits || 0} | ${t("hangar.choose")}`;
     this.elements.controls.classList.add("hidden");
-    this.elements.startButton.textContent = "Back";
+    this.elements.startButton.textContent = t("common.back");
     this.elements.startButton.classList.remove("hidden");
     this.elements.secondaryButton?.classList.add("hidden");
     this.hangarButton.classList.add("hidden");
@@ -99,7 +102,7 @@ export class Menu {
       const card = document.createElement("button");
       card.type = "button";
       card.className = `ship-card ${selected ? "selected" : ""}`;
-      const costText = unlocked ? (selected ? "Selected" : "Unlocked") : `${ship.unlockCost} credits`;
+      const costText = unlocked ? (selected ? t("hangar.selected") : t("hangar.unlocked")) : `${ship.unlockCost} ${t("hangar.credits")}`;
       card.innerHTML = `
         <span class="ship-swatch" style="--ship-color:${ship.color};--ship-accent:${ship.accent}"></span>
         <strong>${ship.name}</strong>
@@ -124,20 +127,23 @@ export class Menu {
   }
 
   showPause(text, muted) {
-    this.show("Tam dung", text, "Resume");
+    this.show(t("pause.title"), text, t("pause.resume"));
     this.elements.overlay.classList.add("pause-mode");
     this.elements.startButton.classList.add("hidden");
     if (this.elements.secondaryButton) this.elements.secondaryButton.classList.add("hidden");
     this.setSoundLabel(muted);
+    this.resumeButton.textContent = t("pause.resume");
+    this.restartButton.textContent = t("common.restart");
+    this.controlsButton.textContent = t("controls.controls");
+    this.mainMenuButton.textContent = t("common.mainMenu");
     this.pauseActions.classList.remove("hidden");
   }
 
   showPauseControls() {
     this.elements.text.innerHTML = [
-      "Move: Mouse / WASD / Arrow Keys",
-      "Fire: Auto / Left Mouse",
-      "Thunder: Right Mouse / E / Shift / Q",
-      "Pause: ESC / P"
+      `${t("controls.moveFire")}: ${t("controls.leftMouse")} / WASD`,
+      `${t("controls.thunder")}: ${t("controls.rightKeys")}`,
+      `${t("controls.pause")}: ${t("controls.pauseKeys")}`
     ].join("<br>");
   }
 

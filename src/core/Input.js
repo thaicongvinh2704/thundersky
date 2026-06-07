@@ -11,6 +11,7 @@ export class Input {
     this.onDebug = null;
     this.cornerTaps = [];
     this.justActivated = false;
+    this.viewport = () => ({ width: window.innerWidth, height: window.innerHeight });
   }
 
   bind() {
@@ -32,6 +33,9 @@ export class Input {
     window.addEventListener("keyup", (event) => this.keys.delete(event.key));
 
     this.canvas.addEventListener("pointermove", (event) => this.setPointer(event, false), { passive: false });
+    window.addEventListener("pointermove", (event) => {
+      if (this.pointer.active && this.pointer.id === event.pointerId) this.setPointer(event, false);
+    }, { passive: false });
     this.canvas.addEventListener("pointerdown", (event) => {
       if (event.button === 2 && !this.mobile) {
         event.preventDefault();
@@ -64,7 +68,11 @@ export class Input {
     window.addEventListener("contextmenu", (event) => {
       if (this.pointer.active || event.target === this.canvas) event.preventDefault();
     });
-    window.addEventListener("blur", () => this.resetPointer());
+    window.addEventListener("blur", () => {
+      this.pointer.fire = false;
+      this.pointer.id = null;
+      this.justActivated = false;
+    });
     document.addEventListener("visibilitychange", () => {
       if (document.hidden) this.resetPointer();
     });
@@ -75,15 +83,20 @@ export class Input {
     this.autoFire = true;
   }
 
+  setViewportProvider(provider) {
+    if (typeof provider === "function") this.viewport = provider;
+  }
+
   setPointer(event, fire) {
     event.preventDefault();
     if (this.pointer.id !== null && this.pointer.id !== event.pointerId) return;
     this.pointer.active = true;
     this.pointer.id = event.pointerId;
     this.pointer.fire = fire || this.pointer.fire;
-    this.pointer.x = Math.max(0, Math.min(window.innerWidth, event.clientX));
-    this.pointer.y = Math.max(0, Math.min(window.innerHeight, event.clientY));
-    this.justActivated = Boolean(fire);
+    const viewport = this.viewport();
+    this.pointer.x = Math.max(0, Math.min(viewport.width, event.clientX));
+    this.pointer.y = Math.max(0, Math.min(viewport.height, event.clientY));
+    if (fire) this.justActivated = true;
   }
 
   resetPointer() {

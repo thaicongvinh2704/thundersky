@@ -24,7 +24,8 @@ export class SpawnSystem {
     this.timer -= dt;
     if (this.timer > 0) return;
     const densityScale = this.game.mobile ? BALANCE.mobile.densityScale * this.game.layout.enemyScale : 1;
-    if (this.game.enemies.length > Math.floor((14 + stage.id * 3) * densityScale)) {
+    const enemyCap = this.game.getPerformanceLimits().enemies;
+    if (this.game.enemies.length >= Math.min(enemyCap, Math.floor((14 + stage.id * 3) * densityScale))) {
       this.timer = 0.35;
       return;
     }
@@ -33,6 +34,7 @@ export class SpawnSystem {
   }
 
   spawn(stage) {
+    if (this.game.enemies.length >= this.game.getPerformanceLimits().enemies) return;
     const type = stage.enemies[Math.floor(Math.random() * stage.enemies.length)];
     const r = 32;
     const x = r + Math.random() * (this.game.width - r * 2);
@@ -168,8 +170,9 @@ export class SpawnSystem {
     this.endlessWaveTimer -= dt;
     this.endlessMiniBossTimer -= dt;
 
-    const crowdedLimit = this.game.mobile ? 19 : 30;
-    const waveLimit = this.game.mobile ? 16 : 24;
+    const tierCap = this.game.getPerformanceLimits().enemies;
+    const crowdedLimit = Math.min(tierCap - 2, this.game.mobile ? 19 : 30);
+    const waveLimit = Math.min(tierCap - 4, this.game.mobile ? 16 : 24);
     const crowded = this.game.enemies.length > crowdedLimit;
 
     if (this.timer <= 0) {

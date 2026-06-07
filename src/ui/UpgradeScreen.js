@@ -1,3 +1,5 @@
+import { t } from "../data/i18n.js";
+
 export class UpgradeScreen {
   constructor(elements) {
     this.elements = elements;
@@ -5,10 +7,10 @@ export class UpgradeScreen {
 
   show(choices, onPick, result = null) {
     this.elements.overlay.classList.remove("hidden");
-    this.elements.title.textContent = "Stage Clear";
+    this.elements.title.textContent = t("upgrade.stageClear");
     this.elements.text.textContent = result
       ? `Rank ${result.rank} | Kills ${result.kills} | Damage ${result.damageTaken} | Max Combo x${result.maxCombo.toFixed(2)} | Credits +${result.credits}`
-      : "Chon 1 nang cap de tiep tuc chien dau.";
+      : t("upgrade.choose");
     this.elements.controls.classList.add("hidden");
     this.elements.startButton.classList.add("hidden");
     if (this.elements.secondaryButton) this.elements.secondaryButton.classList.add("hidden");

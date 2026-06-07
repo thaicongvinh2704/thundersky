@@ -227,6 +227,74 @@ button:disabled {
   pointer-events: auto;
 }
 
+.control-dock {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 6;
+  display: grid;
+  gap: 6px;
+  width: 210px;
+  padding: 10px;
+  color: #dff7ff;
+  background: rgba(5, 16, 29, 0.66);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 8px;
+  opacity: 0.64;
+  transition: opacity 160ms ease;
+}
+
+.control-dock:hover,
+body:has(.pause-mode) .control-dock {
+  opacity: 1;
+}
+
+.control-dock div,
+.control-dock button {
+  display: grid;
+  grid-template-columns: 92px 1fr;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  min-height: 28px;
+  padding: 0;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  text-align: left;
+  font: 700 11px/1.2 Arial, sans-serif;
+}
+
+.control-dock button {
+  cursor: pointer;
+}
+
+.control-dock kbd {
+  padding: 5px 6px;
+  color: #071426;
+  background: #dff7ff;
+  border-radius: 4px;
+  font: 800 10px/1 Arial, sans-serif;
+  text-align: center;
+}
+
+.language-button {
+  position: fixed;
+  right: 18px;
+  bottom: 146px;
+  z-index: 7;
+  min-width: 74px;
+  height: 38px;
+  padding: 0 10px;
+  color: #dff7ff;
+  background: rgba(5, 16, 29, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 7px;
+  font-size: 11px;
+  font-weight: 800;
+}
+
 .mute-button {
   right: 18px;
   bottom: 18px;
@@ -430,6 +498,35 @@ body.is-mobile .pause-button {
   min-width: 58px;
   height: 52px;
   font-size: 14px;
+}
+
+body.is-mobile .control-dock {
+  display: none;
+}
+
+body.is-mobile .language-button {
+  right: auto;
+  left: max(10px, env(safe-area-inset-left));
+  bottom: calc(max(12px, env(safe-area-inset-bottom)) + 50px);
+  min-width: 58px;
+}
+
+@media (min-width: 761px) {
+  .pause-button {
+    display: none;
+  }
+}
+
+@media (max-width: 980px) and (min-width: 761px) {
+  .control-dock {
+    width: 176px;
+  }
+
+  .control-dock div,
+  .control-dock button {
+    grid-template-columns: 78px 1fr;
+    font-size: 10px;
+  }
 }
 
 body.is-mobile .skill-button {
@@ -849,7 +946,7 @@ h1 {
 
   <div class="hud">
     <div class="panel">
-      <div class="label">Diem</div>
+      <div class="label" data-i18n="hud.score">Diem</div>
       <div class="value" id="score">0</div>
       <div class="mini-stat">Best <span id="bestScore">0</span></div>
       <div class="mini-stat">Kills <span id="destroyedCount">0</span></div>
@@ -859,7 +956,7 @@ h1 {
     </div>
 
     <div class="panel status-panel">
-      <div class="label">Mau</div>
+      <div class="label" data-i18n="hud.health">Mau</div>
       <div class="bar"><div class="fill" id="health"></div></div>
       <div class="label" id="energyText">Thunder 0%</div>
       <div class="bar energy-bar"><div class="energy-fill" id="energy"></div></div>
@@ -869,7 +966,7 @@ h1 {
     </div>
 
     <div class="panel upgrades-panel">
-      <div class="label">Nang cap</div>
+      <div class="label" data-i18n="hud.upgrades">Nang cap</div>
       <div id="upgradeList" class="upgrade-list">Chua co</div>
     </div>
   </div>
@@ -877,7 +974,13 @@ h1 {
   <button class="mute-button" id="muteBtn" type="button">Sound On</button>
   <button class="skill-button" id="skillBtn" type="button">Thunder</button>
   <button class="pause-button" id="pauseBtn" type="button" aria-label="Pause">Pause</button>
-  <div class="orientation-hint">Rotate to portrait for best experience</div>
+  <div class="control-dock" id="controlDock">
+    <button id="dockPauseBtn" type="button"><kbd>ESC / P</kbd><span data-i18n="controls.pause">Pause</span></button>
+    <div><kbd>RMB / Q / E</kbd><span data-i18n="controls.thunder">Thunder</span></div>
+    <div><kbd>LMB</kbd><span data-i18n="controls.moveFire">Move + Fire</span></div>
+  </div>
+  <button class="language-button" id="languageBtn" type="button">VI | EN</button>
+  <div class="orientation-hint" id="orientationHint">Rotate to portrait for best experience</div>
   <pre class="debug-overlay hidden" id="debugOverlay"></pre>
 
   <div class="boss-hud hidden" id="bossHud">
@@ -952,6 +1055,59 @@ const BALANCE = {
   stageClearDelay: 0.85,
   missileInterval: 3.4
 };
+
+// src/data/i18n.js
+const LANGUAGES = {
+  vi: {
+    "menu.start": "Bat dau", "menu.hangar": "Nha chua", "menu.intro": "Song sot qua cac dot tan cong, nap nang luong va kich hoat Bao Sam.",
+    "common.back": "Quay lai", "common.restart": "Choi lai", "common.mainMenu": "Menu chinh", "common.soundOn": "Am thanh: Bat", "common.soundOff": "Am thanh: Tat",
+    "language.label": "Ngon ngu: Tieng Viet", "pause.title": "Tam dung", "pause.resume": "Tiep tuc", "pause.help": "Chon thao tac hoac xem lai dieu khien.",
+    "controls.controls": "Dieu khien", "controls.moveFire": "Di chuyen + Ban", "controls.leftMouse": "Chuot trai", "controls.thunder": "Bao Sam", "controls.rightKeys": "Chuot phai / Q / E", "controls.pause": "Tam dung", "controls.pauseKeys": "ESC / P",
+    "hud.score": "Diem", "hud.health": "Mau", "hud.upgrades": "Nang cap", "hud.stage": "Chang", "hud.boss": "Trum", "hud.ship": "Tau", "hud.gun": "Sung", "hud.none": "Chua co",
+    "thunder.ready": "Bao Sam san sang", "thunder.cooldown": "Hoi chieu {seconds}s", "thunder.notReady": "Bao Sam {percent}%",
+    "game.over": "Het tran", "game.overLine": "Phi doi dich van con tren bau troi.", "game.victory": "Chien thang", "game.victoryLine": "Ban da ha trum cuoi. Tiep tuc vo tan de san diem cao hon.",
+    "game.playAgain": "Choi lai", "game.continueEndless": "Tiep tuc vo tan", "game.summary": "Diem: {score}. Ky luc: {best}. Chang: {stage}. Dich ha: {kills}. Combo cao nhat: x{combo}.",
+    "upgrade.stageClear": "Hoan thanh chang", "upgrade.choose": "Chon 1 nang cap de tiep tuc.", "hangar.title": "Nha chua", "hangar.choose": "Chon chien co", "hangar.credits": "Tin dung", "hangar.selected": "Da chon", "hangar.unlocked": "Da mo",
+    "power.repair": "SUA CHUA +18", "power.shield": "KHIEN +1", "power.bomb": "BOM XUNG KICH", "power.rapid": "BAN NHANH", "power.magnet": "NAM CHAM", "power.levelUp": "{weapon} LEN CAP!", "power.switch": "DOI SANG {weapon}",
+    "orientation": "Xoay doc man hinh de choi tot nhat"
+  },
+  en: {
+    "menu.start": "Start", "menu.hangar": "Hangar", "menu.intro": "Survive enemy waves, charge energy, and unleash Thunder Storm.",
+    "common.back": "Back", "common.restart": "Restart", "common.mainMenu": "Main Menu", "common.soundOn": "Sound On", "common.soundOff": "Sound Off",
+    "language.label": "Language: English", "pause.title": "Paused", "pause.resume": "Resume", "pause.help": "Choose an action or review the controls.",
+    "controls.controls": "Controls", "controls.moveFire": "Move + Fire", "controls.leftMouse": "Left Mouse", "controls.thunder": "Thunder", "controls.rightKeys": "Right Click / Q / E", "controls.pause": "Pause", "controls.pauseKeys": "ESC / P",
+    "hud.score": "Score", "hud.health": "HP", "hud.upgrades": "Upgrades", "hud.stage": "Stage", "hud.boss": "Boss", "hud.ship": "Ship", "hud.gun": "Gun", "hud.none": "None",
+    "thunder.ready": "Thunder Ready", "thunder.cooldown": "Cooldown {seconds}s", "thunder.notReady": "Thunder {percent}%",
+    "game.over": "Game Over", "game.overLine": "The enemy fleet still controls the sky.", "game.victory": "Victory", "game.victoryLine": "The final boss is down. Continue Endless for a higher score.",
+    "game.playAgain": "Play Again", "game.continueEndless": "Continue Endless", "game.summary": "Score: {score}. Best: {best}. Stage: {stage}. Enemies: {kills}. Max combo: x{combo}.",
+    "upgrade.stageClear": "Stage Clear", "upgrade.choose": "Choose one upgrade to continue.", "hangar.title": "Hangar", "hangar.choose": "Choose your fighter", "hangar.credits": "Credits", "hangar.selected": "Selected", "hangar.unlocked": "Unlocked",
+    "power.repair": "REPAIR +18", "power.shield": "SHIELD +1", "power.bomb": "BOMB BLAST", "power.rapid": "RAPID FIRE", "power.magnet": "MAGNET ON", "power.levelUp": "{weapon} LEVEL UP!", "power.switch": "SWITCHED TO {weapon}",
+    "orientation": "Rotate to portrait for best experience"
+  }
+};
+
+let currentLanguage = (() => {
+  try { return localStorage.getItem("skyThunderLang") === "en" ? "en" : "vi"; } catch { return "vi"; }
+})();
+
+function getLanguage() { return currentLanguage; }
+
+function setLanguage(language) {
+  currentLanguage = language === "en" ? "en" : "vi";
+  try { localStorage.setItem("skyThunderLang", currentLanguage); } catch {}
+  document.documentElement.lang = currentLanguage;
+  window.dispatchEvent(new CustomEvent("skythunderlanguagechange", { detail: currentLanguage }));
+  return currentLanguage;
+}
+
+function toggleLanguage() {
+  return setLanguage(currentLanguage === "vi" ? "en" : "vi");
+}
+
+function t(key, params = {}) {
+  const template = LANGUAGES[currentLanguage]?.[key] || LANGUAGES.vi[key] || key;
+  return template.replace(/\{(\w+)\}/g, (_, name) => params[name] ?? "");
+}
 
 // src/data/weapons.js
 const WEAPONS = {
@@ -1504,6 +1660,7 @@ class Input {
     this.onDebug = null;
     this.cornerTaps = [];
     this.justActivated = false;
+    this.viewport = () => ({ width: window.innerWidth, height: window.innerHeight });
   }
 
   bind() {
@@ -1525,6 +1682,9 @@ class Input {
     window.addEventListener("keyup", (event) => this.keys.delete(event.key));
 
     this.canvas.addEventListener("pointermove", (event) => this.setPointer(event, false), { passive: false });
+    window.addEventListener("pointermove", (event) => {
+      if (this.pointer.active && this.pointer.id === event.pointerId) this.setPointer(event, false);
+    }, { passive: false });
     this.canvas.addEventListener("pointerdown", (event) => {
       if (event.button === 2 && !this.mobile) {
         event.preventDefault();
@@ -1557,7 +1717,11 @@ class Input {
     window.addEventListener("contextmenu", (event) => {
       if (this.pointer.active || event.target === this.canvas) event.preventDefault();
     });
-    window.addEventListener("blur", () => this.resetPointer());
+    window.addEventListener("blur", () => {
+      this.pointer.fire = false;
+      this.pointer.id = null;
+      this.justActivated = false;
+    });
     document.addEventListener("visibilitychange", () => {
       if (document.hidden) this.resetPointer();
     });
@@ -1568,15 +1732,20 @@ class Input {
     this.autoFire = true;
   }
 
+  setViewportProvider(provider) {
+    if (typeof provider === "function") this.viewport = provider;
+  }
+
   setPointer(event, fire) {
     event.preventDefault();
     if (this.pointer.id !== null && this.pointer.id !== event.pointerId) return;
     this.pointer.active = true;
     this.pointer.id = event.pointerId;
     this.pointer.fire = fire || this.pointer.fire;
-    this.pointer.x = Math.max(0, Math.min(window.innerWidth, event.clientX));
-    this.pointer.y = Math.max(0, Math.min(window.innerHeight, event.clientY));
-    this.justActivated = Boolean(fire);
+    const viewport = this.viewport();
+    this.pointer.x = Math.max(0, Math.min(viewport.width, event.clientX));
+    this.pointer.y = Math.max(0, Math.min(viewport.height, event.clientY));
+    if (fire) this.justActivated = true;
   }
 
   resetPointer() {
@@ -1683,7 +1852,7 @@ class Renderer {
     ctx.fillRect(0, 0, game.width, game.height);
 
     ctx.save();
-    ctx.globalCompositeOperation = game.mobile ? "source-over" : "screen";
+    ctx.globalCompositeOperation = game.mobile || game.performanceTier !== "normal" ? "source-over" : "screen";
     for (const star of game.effects.stars) {
       const alpha = 0.32 + Math.sin(star.twinkle) * 0.18;
       ctx.fillStyle = `rgba(190,239,255,${alpha})`;
@@ -1699,7 +1868,7 @@ class Renderer {
     ctx.globalAlpha = 0.22;
     ctx.strokeStyle = "#76d8ff";
     ctx.lineWidth = 1;
-    const streaks = game.mobile ? 5 : 9;
+    const streaks = Math.max(2, Math.ceil((game.mobile ? 5 : 9) * game.getEffectScale()));
     for (let i = 0; i < streaks; i++) {
       const x = ((time * 0.035 + i * 170) % (game.width + 220)) - 110;
       ctx.beginPath();
@@ -1726,14 +1895,14 @@ class Renderer {
   drawLightnings() {
     const { ctx, game } = this;
     ctx.save();
-    ctx.globalCompositeOperation = "lighter";
+    ctx.globalCompositeOperation = game.performanceTier === "critical" ? "source-over" : "lighter";
     for (const bolt of game.effects.lightnings) {
       const alpha = Math.max(0, bolt.life / bolt.maxLife);
       ctx.globalAlpha = alpha;
       ctx.strokeStyle = "#bdf7ff";
       ctx.lineWidth = bolt.width;
       ctx.shadowColor = "#77e7ff";
-      ctx.shadowBlur = game.mobile ? 8 : 18;
+      ctx.shadowBlur = (game.mobile ? 8 : 18) * game.getEffectScale();
       ctx.beginPath();
       ctx.moveTo(bolt.x1, bolt.y1);
       const dx = bolt.x2 - bolt.x1;
@@ -1763,7 +1932,7 @@ class Renderer {
       const y = game.height * 0.2 + i * 34 - (1 - alpha) * 18;
       ctx.globalAlpha = alpha;
       ctx.shadowColor = "rgba(255,225,120,0.9)";
-      ctx.shadowBlur = game.mobile ? 8 : 18;
+      ctx.shadowBlur = (game.mobile ? 8 : 18) * game.getEffectScale();
       ctx.fillStyle = "#fff3a6";
       ctx.fillText(message.text, game.width / 2, y);
     }
@@ -1963,7 +2132,9 @@ class Enemy {
     if (this.fireTimer <= 0 && this.y > 35) {
       this.fire(game);
       const mobileFireScale = game.mobile ? BALANCE.mobile.hunterFireScale : 1;
-      this.fireTimer = Math.max(0.55, (this.config.fireRate * mobileFireScale) / this.fireRateScale);
+      const bulletLoad = game.enemyBullets.length / game.getPerformanceLimits().enemyBullets;
+      const loadScale = bulletLoad > 0.85 ? 1.35 : bulletLoad > 0.7 ? 1.16 : 1;
+      this.fireTimer = Math.max(0.55, (this.config.fireRate * mobileFireScale * loadScale) / this.fireRateScale);
     }
 
     if (this.config.carrier && this.y > 40) {
@@ -2847,7 +3018,7 @@ class EffectsSystem {
 
   makeStars() {
     this.stars.length = 0;
-    const scale = this.game.mobile ? BALANCE.mobile.starScale : 1;
+    const scale = (this.game.mobile ? BALANCE.mobile.starScale : 1) * this.game.getEffectScale();
     const count = Math.floor((this.game.width * this.game.height * scale) / 9000);
     for (let i = 0; i < count; i++) {
       this.stars.push({
@@ -2860,7 +3031,7 @@ class EffectsSystem {
   }
 
   burst(x, y, color, count, speed, life) {
-    const particleCount = this.game.mobile ? Math.ceil(count * 0.64) : count;
+    const particleCount = Math.max(1, Math.ceil((this.game.mobile ? count * 0.64 : count) * this.game.getEffectScale()));
     const particleSpeed = this.game.mobile ? speed * 0.86 : speed;
     for (let i = 0; i < particleCount; i++) {
       if (this.particles.length >= this.maxParticles) this.particles.shift();
@@ -2899,7 +3070,7 @@ class EffectsSystem {
       });
       this.burst(target.x, target.y, "#bdf7ff", 10, 170, 0.38);
     }
-    const boltCount = this.game.mobile ? 5 : 10;
+    const boltCount = Math.max(2, Math.ceil((this.game.mobile ? 5 : 10) * this.game.getEffectScale()));
     for (let i = 0; i < boltCount; i++) {
       const angle = (Math.PI * 2 * i) / boltCount;
       this.lightnings.push({
@@ -2919,7 +3090,8 @@ class EffectsSystem {
   update(dt) {
     this.cloudTimer -= dt;
     if (this.cloudTimer <= 0) {
-      if (!this.game.mobile || this.clouds.length < BALANCE.mobile.cloudCap) {
+      const cloudCap = Math.max(2, Math.ceil((this.game.mobile ? BALANCE.mobile.cloudCap : 14) * this.game.getEffectScale()));
+      if (this.clouds.length < cloudCap) {
         const scale = this.game.mobile ? BALANCE.mobile.cloudScale : 1;
         this.clouds.push({
           x: -120 + Math.random() * (this.game.width + 240),
@@ -3209,7 +3381,8 @@ class SpawnSystem {
     this.timer -= dt;
     if (this.timer > 0) return;
     const densityScale = this.game.mobile ? BALANCE.mobile.densityScale * this.game.layout.enemyScale : 1;
-    if (this.game.enemies.length > Math.floor((14 + stage.id * 3) * densityScale)) {
+    const enemyCap = this.game.getPerformanceLimits().enemies;
+    if (this.game.enemies.length >= Math.min(enemyCap, Math.floor((14 + stage.id * 3) * densityScale))) {
       this.timer = 0.35;
       return;
     }
@@ -3218,6 +3391,7 @@ class SpawnSystem {
   }
 
   spawn(stage) {
+    if (this.game.enemies.length >= this.game.getPerformanceLimits().enemies) return;
     const type = stage.enemies[Math.floor(Math.random() * stage.enemies.length)];
     const r = 32;
     const x = r + Math.random() * (this.game.width - r * 2);
@@ -3353,8 +3527,9 @@ class SpawnSystem {
     this.endlessWaveTimer -= dt;
     this.endlessMiniBossTimer -= dt;
 
-    const crowdedLimit = this.game.mobile ? 19 : 30;
-    const waveLimit = this.game.mobile ? 16 : 24;
+    const tierCap = this.game.getPerformanceLimits().enemies;
+    const crowdedLimit = Math.min(tierCap - 2, this.game.mobile ? 19 : 30);
+    const waveLimit = Math.min(tierCap - 4, this.game.mobile ? 16 : 24);
     const crowded = this.game.enemies.length > crowdedLimit;
 
     if (this.timer <= 0) {
@@ -3576,13 +3751,13 @@ class Hud {
         : `Best Endless ${Math.floor(game.save.best.endlessTime || 0)}s`;
     }
     this.elements.health.style.width = `${Math.max(0, (player.health / player.maxHealth) * 100)}%`;
-    this.elements.stage.textContent = stage ? stage.name : "Stage";
-    this.elements.time.textContent = stage && !stage.boss ? `${Math.ceil(game.stageSystem.timer)}s` : "Boss";
+    this.elements.stage.textContent = stage ? stage.name : t("hud.stage");
+    this.elements.time.textContent = stage && !stage.boss ? `${Math.ceil(game.stageSystem.timer)}s` : t("hud.boss");
     if (this.elements.energy) this.elements.energy.style.width = `${Math.max(0, (player.energy / 100) * 100)}%`;
     if (this.elements.energyText) {
       this.elements.energyText.textContent = player.thunderCooldown > 0
-        ? `Thunder ${player.thunderCooldown.toFixed(1)}s`
-        : player.energy >= 100 ? "Thunder Ready" : `Thunder ${Math.floor(player.energy)}%`;
+        ? t("thunder.cooldown", { seconds: player.thunderCooldown.toFixed(1) })
+        : player.energy >= 100 ? t("thunder.ready") : t("thunder.notReady", { percent: Math.floor(player.energy) });
     }
     if (this.elements.powerTimers) {
       const timers = [];
@@ -3594,11 +3769,11 @@ class Hud {
     if (this.elements.skillButton) {
       const ready = player.energy >= 100 && player.thunderCooldown <= 0;
       this.elements.skillButton.disabled = !ready;
-      this.elements.skillButton.textContent = ready ? "Thunder" : player.thunderCooldown > 0 ? `${player.thunderCooldown.toFixed(1)}s` : `${Math.floor(player.energy)}%`;
+      this.elements.skillButton.textContent = ready ? t("controls.thunder") : player.thunderCooldown > 0 ? `${player.thunderCooldown.toFixed(1)}s` : `${Math.floor(player.energy)}%`;
       this.elements.skillButton.classList.toggle("ready", ready);
     }
-    const upgrades = [`Ship: ${player.ship.name}`, `Gun: ${player.weapon.name} Lv.${player.weaponLevel}`, ...player.upgrades];
-    this.elements.upgrades.textContent = upgrades.length ? upgrades.join(" | ") : "Chua co";
+    const upgrades = [`${t("hud.ship")}: ${player.ship.name}`, `${t("hud.gun")}: ${player.weapon.name} Lv.${player.weaponLevel}`, ...player.upgrades];
+    this.elements.upgrades.textContent = upgrades.length ? upgrades.join(" | ") : t("hud.none");
 
     if (game.boss) {
       this.elements.bossHud.classList.remove("hidden");
@@ -3615,16 +3790,16 @@ class Menu {
     this.elements = elements;
     this.startHandler = null;
     this.defaultStartHandler = null;
-    this.hangarButton = this.makeActionButton("Hangar");
+    this.hangarButton = this.makeActionButton(t("menu.hangar"));
     this.hangarButton.className = "hangar-button";
     this.elements.startButton.insertAdjacentElement("afterend", this.hangarButton);
     this.pauseActions = document.createElement("div");
     this.pauseActions.className = "pause-actions hidden";
-    this.resumeButton = this.makeActionButton("Resume", "primary");
-    this.restartButton = this.makeActionButton("Restart");
-    this.soundButton = this.makeActionButton("Sound");
-    this.controlsButton = this.makeActionButton("Controls");
-    this.mainMenuButton = this.makeActionButton("Main Menu");
+    this.resumeButton = this.makeActionButton(t("pause.resume"), "primary");
+    this.restartButton = this.makeActionButton(t("common.restart"));
+    this.soundButton = this.makeActionButton(t("common.soundOn"));
+    this.controlsButton = this.makeActionButton(t("controls.controls"));
+    this.mainMenuButton = this.makeActionButton(t("common.mainMenu"));
     this.pauseActions.append(this.resumeButton, this.restartButton, this.soundButton, this.controlsButton, this.mainMenuButton);
     this.elements.startButton.insertAdjacentElement("beforebegin", this.pauseActions);
   }
@@ -3662,12 +3837,13 @@ class Menu {
   }
 
   setSoundLabel(muted) {
-    this.soundButton.textContent = muted ? "Sound Off" : "Sound On";
+    this.soundButton.textContent = t(muted ? "common.soundOff" : "common.soundOn");
   }
 
   showMenu() {
     this.startHandler = this.defaultStartHandler;
-    this.show("Sky Thunder", "Song sot qua cac wave, gom nang luong va kich hoat Thunder Storm khi day pin.", "Bat dau", true);
+    this.show("Sky Thunder", t("menu.intro"), t("menu.start"), true);
+    this.hangarButton.textContent = t("menu.hangar");
   }
 
   show(title, text, buttonText, showControls = false, secondaryText = "") {
@@ -3692,10 +3868,10 @@ class Menu {
   showHangar({ ships, save, onSelect, onBack }) {
     this.elements.overlay.classList.remove("hidden");
     this.elements.overlay.classList.remove("pause-mode");
-    this.elements.title.textContent = "Hangar";
-    this.elements.text.textContent = `Credits ${save.best.credits || 0} | Choose your fighter`;
+    this.elements.title.textContent = t("hangar.title");
+    this.elements.text.textContent = `${t("hangar.credits")} ${save.best.credits || 0} | ${t("hangar.choose")}`;
     this.elements.controls.classList.add("hidden");
-    this.elements.startButton.textContent = "Back";
+    this.elements.startButton.textContent = t("common.back");
     this.elements.startButton.classList.remove("hidden");
     this.elements.secondaryButton?.classList.add("hidden");
     this.hangarButton.classList.add("hidden");
@@ -3711,7 +3887,7 @@ class Menu {
       const card = document.createElement("button");
       card.type = "button";
       card.className = `ship-card ${selected ? "selected" : ""}`;
-      const costText = unlocked ? (selected ? "Selected" : "Unlocked") : `${ship.unlockCost} credits`;
+      const costText = unlocked ? (selected ? t("hangar.selected") : t("hangar.unlocked")) : `${ship.unlockCost} ${t("hangar.credits")}`;
       card.innerHTML = `
         <span class="ship-swatch" style="--ship-color:${ship.color};--ship-accent:${ship.accent}"></span>
         <strong>${ship.name}</strong>
@@ -3736,20 +3912,23 @@ class Menu {
   }
 
   showPause(text, muted) {
-    this.show("Tam dung", text, "Resume");
+    this.show(t("pause.title"), text, t("pause.resume"));
     this.elements.overlay.classList.add("pause-mode");
     this.elements.startButton.classList.add("hidden");
     if (this.elements.secondaryButton) this.elements.secondaryButton.classList.add("hidden");
     this.setSoundLabel(muted);
+    this.resumeButton.textContent = t("pause.resume");
+    this.restartButton.textContent = t("common.restart");
+    this.controlsButton.textContent = t("controls.controls");
+    this.mainMenuButton.textContent = t("common.mainMenu");
     this.pauseActions.classList.remove("hidden");
   }
 
   showPauseControls() {
     this.elements.text.innerHTML = [
-      "Move: Mouse / WASD / Arrow Keys",
-      "Fire: Auto / Left Mouse",
-      "Thunder: Right Mouse / E / Shift / Q",
-      "Pause: ESC / P"
+      `${t("controls.moveFire")}: ${t("controls.leftMouse")} / WASD`,
+      `${t("controls.thunder")}: ${t("controls.rightKeys")}`,
+      `${t("controls.pause")}: ${t("controls.pauseKeys")}`
     ].join("<br>");
   }
 
@@ -3767,10 +3946,10 @@ class UpgradeScreen {
 
   show(choices, onPick, result = null) {
     this.elements.overlay.classList.remove("hidden");
-    this.elements.title.textContent = "Stage Clear";
+    this.elements.title.textContent = t("upgrade.stageClear");
     this.elements.text.textContent = result
       ? `Rank ${result.rank} | Kills ${result.kills} | Damage ${result.damageTaken} | Max Combo x${result.maxCombo.toFixed(2)} | Credits +${result.credits}`
-      : "Chon 1 nang cap de tiep tuc chien dau.";
+      : t("upgrade.choose");
     this.elements.controls.classList.add("hidden");
     this.elements.startButton.classList.add("hidden");
     if (this.elements.secondaryButton) this.elements.secondaryButton.classList.add("hidden");
@@ -3802,21 +3981,21 @@ class GameOverScreen {
   }
 
   show(game) {
-    this.menu.show("Het Tran", this.summary(game, "Phi doi dich van con tren bau troi."), "Choi lai");
+    this.menu.show(t("game.over"), `${t("game.overLine")} ${this.summary(game)}`, t("game.playAgain"));
   }
 
   win(game) {
-    this.menu.show("Victory", this.summary(game, "Ban da ha boss cuoi. Tiep tuc Endless de san diem cao hon."), "Continue Endless", false, "Restart");
+    this.menu.show(t("game.victory"), `${t("game.victoryLine")} ${this.summary(game)}`, t("game.continueEndless"), false, t("common.restart"));
   }
 
   paused(game) {
-    this.menu.showPause("Resume de quay lai tran chien. Controls se hien phim va chuot dang ho tro.", game.audio.muted);
+    this.menu.showPause(t("pause.help"), game.audio.muted);
     this.menu.showPauseControls();
   }
 
-  summary(game, line) {
+  summary(game) {
     const endless = game.stats.endlessTime ? ` Endless: ${Math.floor(game.stats.endlessTime)}s. Best endless: ${Math.floor(game.save.best.endlessTime || 0)}s.` : "";
-    return `${line} Score: ${game.score}. Best: ${game.save.best.score || 0}. Stage reached: ${game.stats.stageReached}. Enemies destroyed: ${game.stats.enemiesDestroyed}. Max combo: x${(game.stats.maxCombo || 1).toFixed(2)}.${endless}`;
+    return `${t("game.summary", { score: game.score, best: game.save.best.score || 0, stage: game.stats.stageReached, kills: game.stats.enemiesDestroyed, combo: (game.stats.maxCombo || 1).toFixed(2) })}${endless}`;
   }
 }
 
@@ -3842,7 +4021,9 @@ class Game {
     this.stats = { enemiesDestroyed: 0, stageReached: 1, maxCombo: 1, endlessTime: 0, stageHits: 0, totalHits: 0, bossTime: 0, stageKills: 0, stageDamageTaken: 0, creditsEarned: 0 };
     this.combo = { count: 0, multiplier: 1, timer: 0, maxTimer: 3.2 };
     this.endless = { active: false, time: 0, multiplier: 1, survivalBonusTimer: 0 };
-    this.debug = { visible: false, fps: 0, frames: 0, elapsed: 0 };
+    this.debug = { visible: false, fps: 60, frames: 0, elapsed: 0 };
+    this.performanceTier = "normal";
+    this.performanceSamples = { low: 0, critical: 0, recovery: 0 };
     this.stageResult = null;
     this.mobile = false;
     this.layout = {
@@ -3868,6 +4049,7 @@ class Game {
     this.menu = new Menu(menu);
     this.upgradeScreen = new UpgradeScreen(menu);
     this.gameOverScreen = new GameOverScreen(this.menu);
+    this.lang = getLanguage();
   }
 
   init() {
@@ -3884,6 +4066,7 @@ class Game {
     this.input.onPause = () => this.togglePause();
     this.input.onDebug = () => this.toggleDebug();
     this.input.bind();
+    this.input.setViewportProvider(() => ({ width: this.width, height: this.height }));
     this.audio.bind();
     if (this.hud.elements.skillButton) {
       this.hud.elements.skillButton.addEventListener("pointerdown", (event) => event.stopPropagation());
@@ -3899,6 +4082,18 @@ class Game {
         this.togglePause();
       });
     }
+    if (this.hud.elements.dockPauseButton) {
+      this.hud.elements.dockPauseButton.addEventListener("pointerdown", (event) => event.stopPropagation());
+      this.hud.elements.dockPauseButton.addEventListener("click", () => this.togglePause());
+    }
+    if (this.hud.elements.languageButton) {
+      this.hud.elements.languageButton.addEventListener("pointerdown", (event) => event.stopPropagation());
+      this.hud.elements.languageButton.addEventListener("click", () => {
+        this.lang = toggleLanguage();
+        this.refreshLanguage();
+      });
+    }
+    window.addEventListener("skythunderlanguagechange", () => this.refreshLanguage());
     this.menu.bindStart(() => {
       if (this.state.is(STATES.PAUSED)) this.resume();
       else if (this.state.is(STATES.WIN)) this.continueEndless();
@@ -3918,6 +4113,7 @@ class Game {
       mainMenu: () => this.returnToMenu()
     });
     this.menu.showMenu();
+    this.refreshLanguage();
     this.audio.startMusic("menu");
     if (new URLSearchParams(window.location.search).get("debug") === "1") this.toggleDebug();
     this.renderer.render(0);
@@ -3925,7 +4121,10 @@ class Game {
 
   resize() {
     this.updateMobileState();
-    const cap = this.mobile ? (this.debug.fps && this.debug.fps < BALANCE.mobile.lowFpsThreshold ? BALANCE.mobile.lowFpsDprCap : BALANCE.mobile.dprCap) : 2;
+    const caps = this.mobile
+      ? { normal: 1.35, low: 1.15, critical: 1 }
+      : { normal: 1.75, low: 1.35, critical: 1.15 };
+    const cap = caps[this.performanceTier];
     this.dpr = Math.min(window.devicePixelRatio || 1, cap);
     const viewport = window.visualViewport;
     this.width = Math.max(1, Math.floor(viewport?.width || window.innerWidth));
@@ -3981,7 +4180,7 @@ class Game {
     document.body.classList.toggle("is-landscape", this.mobile && landscape);
     document.body.classList.toggle("is-small-phone", this.mobile && tiny);
     this.input.setMobile(this.mobile);
-    this.effects.maxParticles = this.mobile ? mobile.maxParticles : 280;
+    this.effects.maxParticles = this.getPerformanceLimits().particles;
   }
 
   start() {
@@ -4105,11 +4304,35 @@ class Game {
   }
 
   enforceSoftCaps() {
-    if (this.playerBullets.length > 180) this.playerBullets.splice(0, this.playerBullets.length - 180);
-    const enemyBulletCap = this.mobile ? BALANCE.mobile.enemyBulletCap : 260;
-    const powerUpCap = this.mobile ? BALANCE.mobile.powerUpCap : 24;
-    if (this.enemyBullets.length > enemyBulletCap) this.enemyBullets.splice(0, this.enemyBullets.length - enemyBulletCap);
-    if (this.powerUps.length > powerUpCap) this.powerUps.splice(0, this.powerUps.length - powerUpCap);
+    const limits = this.getPerformanceLimits();
+    this.trimOldest(this.playerBullets, limits.playerBullets);
+    this.trimOldest(this.enemyBullets, limits.enemyBullets);
+    this.trimOldest(this.powerUps, limits.powerUps);
+    this.trimOldest(this.enemies, limits.enemies);
+    this.trimOldest(this.effects.particles, limits.particles);
+  }
+
+  trimOldest(items, cap) {
+    if (items.length <= cap) return;
+    const excess = items.length - cap;
+    items.splice(0, excess);
+  }
+
+  getPerformanceLimits() {
+    const desktop = {
+      normal: { playerBullets: 160, enemyBullets: 220, particles: 200, powerUps: 16, enemies: 34 },
+      low: { playerBullets: 130, enemyBullets: 180, particles: 140, powerUps: 12, enemies: 28 },
+      critical: { playerBullets: 100, enemyBullets: 140, particles: 90, powerUps: 10, enemies: 22 }
+    };
+    const limits = { ...desktop[this.performanceTier] };
+    if (this.mobile) {
+      for (const key of Object.keys(limits)) limits[key] = Math.max(8, Math.floor(limits[key] * 0.8));
+    }
+    return limits;
+  }
+
+  getEffectScale() {
+    return this.performanceTier === "critical" ? 0.18 : this.performanceTier === "low" ? 0.42 : 1;
   }
 
   checkCollisions() {
@@ -4168,32 +4391,32 @@ class Game {
       const id = powerUp.type.slice(7);
       const sameWeapon = player.weapon.id === id;
       player.setWeapon(id);
-      this.warn(sameWeapon ? `${player.weapon.name.toUpperCase()} LEVEL UP!` : `SWITCHED TO ${player.weapon.name.toUpperCase()}`);
+      this.warn(t(sameWeapon ? "power.levelUp" : "power.switch", { weapon: player.weapon.name.toUpperCase() }));
       return;
     }
     if (powerUp.type === "repair") {
       player.health = Math.min(player.maxHealth, player.health + 18);
-      this.effects.message("REPAIR +18");
+      this.effects.message(t("power.repair"));
       return;
     }
     if (powerUp.type === "shield") {
       player.shields += 1;
-      this.effects.message("SHIELD +1");
+      this.effects.message(t("power.shield"));
       return;
     }
     if (powerUp.type === "bomb") {
       this.bombBlast();
-      this.warn("BOMB BLAST");
+      this.warn(t("power.bomb"));
       return;
     }
     if (powerUp.type === "rapid") {
       player.rapidTimer = Math.max(player.rapidTimer, 6);
-      this.effects.message("RAPID FIRE");
+      this.effects.message(t("power.rapid"));
       return;
     }
     if (powerUp.type === "magnet") {
       player.magnetTimer = Math.max(player.magnetTimer, 5);
-      this.effects.message("MAGNET ON");
+      this.effects.message(t("power.magnet"));
       return;
     }
     const gain = BALANCE.thunder.chargePerPickup * (1 + player.stats.thunderCharge);
@@ -4399,15 +4622,18 @@ class Game {
   updateDebug(dt) {
     this.debug.frames += 1;
     this.debug.elapsed += dt;
-    if (this.debug.elapsed >= 0.5) {
+    if (this.debug.elapsed >= 1.2) {
       this.debug.fps = Math.round(this.debug.frames / this.debug.elapsed);
       this.debug.frames = 0;
       this.debug.elapsed = 0;
+      this.updatePerformanceTier();
     }
     const overlay = this.hud.elements.debugOverlay;
     if (!overlay || !this.debug.visible) return;
     overlay.textContent = [
       `FPS ${this.debug.fps}`,
+      `Tier ${this.performanceTier}`,
+      `DPR ${this.dpr.toFixed(2)}`,
       `State ${this.state.state}`,
       `Enemies ${this.enemies.length}`,
       `P Bullets ${this.playerBullets.length}`,
@@ -4416,6 +4642,34 @@ class Game {
       `PowerUps ${this.powerUps.length}`,
       `Endless ${Math.floor(this.endless.time)}s`
     ].join("\n");
+  }
+
+  updatePerformanceTier() {
+    const fps = this.debug.fps;
+    this.performanceSamples.critical = fps < 35 ? this.performanceSamples.critical + 1 : 0;
+    this.performanceSamples.low = fps < 45 ? this.performanceSamples.low + 1 : 0;
+    this.performanceSamples.recovery = fps >= 55 ? this.performanceSamples.recovery + 1 : 0;
+    let next = this.performanceTier;
+    if (this.performanceSamples.critical >= 2) next = "critical";
+    else if (this.performanceSamples.low >= 3 && this.performanceTier === "normal") next = "low";
+    else if (this.performanceSamples.recovery >= 3) next = this.performanceTier === "critical" ? "low" : "normal";
+    if (next !== this.performanceTier) {
+      this.performanceTier = next;
+      this.effects.maxParticles = this.getPerformanceLimits().particles;
+      this.resizeSoon();
+    }
+  }
+
+  refreshLanguage() {
+    this.lang = getLanguage();
+    if (this.state.is(STATES.MENU)) this.menu.showMenu();
+    else if (this.state.is(STATES.PAUSED)) this.gameOverScreen.paused(this);
+    else if (this.state.is(STATES.WIN)) this.gameOverScreen.win(this);
+    else if (this.state.is(STATES.GAME_OVER)) this.gameOverScreen.show(this);
+    if (this.hud.elements.languageButton) this.hud.elements.languageButton.textContent = this.lang === "vi" ? "VI | EN" : "EN | VI";
+    if (this.hud.elements.orientationHint) this.hud.elements.orientationHint.textContent = t("orientation");
+    for (const label of document.querySelectorAll("[data-i18n]")) label.textContent = t(label.dataset.i18n);
+    this.hud.update(this);
   }
 
   activateThunder() {
@@ -4591,6 +4845,9 @@ const game = new Game({
     muteButton: document.getElementById("muteBtn"),
     skillButton: document.getElementById("skillBtn"),
     pauseButton: document.getElementById("pauseBtn"),
+    dockPauseButton: document.getElementById("dockPauseBtn"),
+    languageButton: document.getElementById("languageBtn"),
+    orientationHint: document.getElementById("orientationHint"),
     debugOverlay: document.getElementById("debugOverlay")
   },
   menu: {

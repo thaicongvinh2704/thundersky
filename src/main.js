@@ -21,6 +21,9 @@ const game = new Game({
     muteButton: document.getElementById("muteBtn"),
     skillButton: document.getElementById("skillBtn"),
     pauseButton: document.getElementById("pauseBtn"),
+    dockPauseButton: document.getElementById("dockPauseBtn"),
+    languageButton: document.getElementById("languageBtn"),
+    orientationHint: document.getElementById("orientationHint"),
     debugOverlay: document.getElementById("debugOverlay")
   },
   menu: {

@@ -2120,3 +2120,45 @@ Sau moi dot hoan thanh tinh nang, sua loi, build hoac deploy, can cap nhat file 
 - Lenh build/test da chay va ket qua.
 - Trang thai commit/push/deploy.
 - Cac loi, rui ro hoac viec con lai can kiem tra.
+
+## 33. Cap Nhat Performance, PC Control Va Song Ngu
+
+Cap nhat ngay 07/06/2026 theo yeu cau trong `pasted-text.txt`.
+
+### Noi Dung Da Hoan Thanh
+
+- Them performance tier `normal`, `low`, `critical`, do FPS trung binh moi 1.2 giay va co hysteresis de tranh doi tier lien tuc.
+- DPR desktop theo tier: `1.75`, `1.35`, `1.15`; mobile: `1.35`, `1.15`, `1.0`.
+- Object cap theo tier cho player bullet, enemy bullet, particle, power-up va enemy; mobile giam them 20%.
+- Particle, star, cloud, streak, lightning, glow va composite effect tu dong giam theo tier.
+- Spawn thuong va Endless dung cap enemy hien tai; enemy fire cham nhe khi enemy bullet gan day cap.
+- Debug F3 hien them performance tier va DPR.
+- Input co `pointermove` fallback tren `window`, pointer capture, clamp theo kich thuoc game va giu target cuoi khi cua so mat focus.
+- UI button Pause, Thunder va Language chan pointer propagation de khong lam player teleport.
+- Them Control Dock desktop o goc duoi phai:
+  - `ESC / P`: Pause.
+  - `RMB / Q / E`: Thunder.
+  - `LMB`: Move + Fire.
+- Nut Pause desktop chinh nam trong Control Dock; mobile van giu nut Pause rieng.
+- Them `src/data/i18n.js`, mac dinh Tieng Viet, co English va luu lua chon bang `skyThunderLang`.
+- Nut `VI | EN` doi ngon ngu ngay, khong reload.
+- Da localization cac text chinh cua menu, pause, control guide, HUD dynamic, game over, victory, Hangar, upgrade screen va power-up feedback.
+- `tools/build-standalone.js` da include `i18n.js` va markup Control Dock/Language.
+- Da build lai `index.html` va `Sky-Thunder-Play.html`.
+
+### Kiem Thu Da Chay
+
+- `node --check` tat ca file JS da sua: pass.
+- `node --check tools/build-standalone.js`: pass.
+- `node tools/build-standalone.js`: pass.
+- `git diff --check`: pass, chi co canh bao LF/CRLF cua Windows.
+- Static check xac nhan standalone co performance tier, DPR debug, Control Dock, language storage va window pointer fallback.
+
+### Kiem Thu Thu Cong Con Lai
+
+- Keo chuot ra ngoai canvas, xuong taskbar va quay lai tren Chrome/Edge that.
+- Quan sat tier tu dong doi khi FPS thap trong man dong va phuc hoi khi tai giam.
+- Kiem tra Control Dock o desktop nho va desktop rong.
+- Doi VI/EN tai menu, luc dang choi, pause, game over va victory.
+- Playtest Endless sau 3 phut de danh gia cap enemy/bullet va do kho.
+- Kiem tra Android Chrome va iPhone Safari de dam bao Control Dock an, nut mobile khong bi che.

@@ -1,3 +1,5 @@
+import { t } from "../data/i18n.js";
+
 export class Hud {
   constructor(elements) {
     this.elements = elements;
@@ -17,13 +19,13 @@ export class Hud {
         : `Best Endless ${Math.floor(game.save.best.endlessTime || 0)}s`;
     }
     this.elements.health.style.width = `${Math.max(0, (player.health / player.maxHealth) * 100)}%`;
-    this.elements.stage.textContent = stage ? stage.name : "Stage";
-    this.elements.time.textContent = stage && !stage.boss ? `${Math.ceil(game.stageSystem.timer)}s` : "Boss";
+    this.elements.stage.textContent = stage ? stage.name : t("hud.stage");
+    this.elements.time.textContent = stage && !stage.boss ? `${Math.ceil(game.stageSystem.timer)}s` : t("hud.boss");
     if (this.elements.energy) this.elements.energy.style.width = `${Math.max(0, (player.energy / 100) * 100)}%`;
     if (this.elements.energyText) {
       this.elements.energyText.textContent = player.thunderCooldown > 0
-        ? `Thunder ${player.thunderCooldown.toFixed(1)}s`
-        : player.energy >= 100 ? "Thunder Ready" : `Thunder ${Math.floor(player.energy)}%`;
+        ? t("thunder.cooldown", { seconds: player.thunderCooldown.toFixed(1) })
+        : player.energy >= 100 ? t("thunder.ready") : t("thunder.notReady", { percent: Math.floor(player.energy) });
     }
     if (this.elements.powerTimers) {
       const timers = [];
@@ -35,11 +37,11 @@ export class Hud {
     if (this.elements.skillButton) {
       const ready = player.energy >= 100 && player.thunderCooldown <= 0;
       this.elements.skillButton.disabled = !ready;
-      this.elements.skillButton.textContent = ready ? "Thunder" : player.thunderCooldown > 0 ? `${player.thunderCooldown.toFixed(1)}s` : `${Math.floor(player.energy)}%`;
+      this.elements.skillButton.textContent = ready ? t("controls.thunder") : player.thunderCooldown > 0 ? `${player.thunderCooldown.toFixed(1)}s` : `${Math.floor(player.energy)}%`;
       this.elements.skillButton.classList.toggle("ready", ready);
     }
-    const upgrades = [`Ship: ${player.ship.name}`, `Gun: ${player.weapon.name} Lv.${player.weaponLevel}`, ...player.upgrades];
-    this.elements.upgrades.textContent = upgrades.length ? upgrades.join(" | ") : "Chua co";
+    const upgrades = [`${t("hud.ship")}: ${player.ship.name}`, `${t("hud.gun")}: ${player.weapon.name} Lv.${player.weaponLevel}`, ...player.upgrades];
+    this.elements.upgrades.textContent = upgrades.length ? upgrades.join(" | ") : t("hud.none");
 
     if (game.boss) {
       this.elements.bossHud.classList.remove("hidden");

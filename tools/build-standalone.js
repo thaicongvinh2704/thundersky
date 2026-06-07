@@ -11,6 +11,7 @@ const cssFiles = [
 
 const scriptFiles = [
   "src/data/balance.js",
+  "src/data/i18n.js",
   "src/data/weapons.js",
   "src/data/ships.js",
   "src/data/enemies.js",
@@ -75,7 +76,7 @@ ${styles}
 
   <div class="hud">
     <div class="panel">
-      <div class="label">Diem</div>
+      <div class="label" data-i18n="hud.score">Diem</div>
       <div class="value" id="score">0</div>
       <div class="mini-stat">Best <span id="bestScore">0</span></div>
       <div class="mini-stat">Kills <span id="destroyedCount">0</span></div>
@@ -85,7 +86,7 @@ ${styles}
     </div>
 
     <div class="panel status-panel">
-      <div class="label">Mau</div>
+      <div class="label" data-i18n="hud.health">Mau</div>
       <div class="bar"><div class="fill" id="health"></div></div>
       <div class="label" id="energyText">Thunder 0%</div>
       <div class="bar energy-bar"><div class="energy-fill" id="energy"></div></div>
@@ -95,7 +96,7 @@ ${styles}
     </div>
 
     <div class="panel upgrades-panel">
-      <div class="label">Nang cap</div>
+      <div class="label" data-i18n="hud.upgrades">Nang cap</div>
       <div id="upgradeList" class="upgrade-list">Chua co</div>
     </div>
   </div>
@@ -103,7 +104,13 @@ ${styles}
   <button class="mute-button" id="muteBtn" type="button">Sound On</button>
   <button class="skill-button" id="skillBtn" type="button">Thunder</button>
   <button class="pause-button" id="pauseBtn" type="button" aria-label="Pause">Pause</button>
-  <div class="orientation-hint">Rotate to portrait for best experience</div>
+  <div class="control-dock" id="controlDock">
+    <button id="dockPauseBtn" type="button"><kbd>ESC / P</kbd><span data-i18n="controls.pause">Pause</span></button>
+    <div><kbd>RMB / Q / E</kbd><span data-i18n="controls.thunder">Thunder</span></div>
+    <div><kbd>LMB</kbd><span data-i18n="controls.moveFire">Move + Fire</span></div>
+  </div>
+  <button class="language-button" id="languageBtn" type="button">VI | EN</button>
+  <div class="orientation-hint" id="orientationHint">Rotate to portrait for best experience</div>
   <pre class="debug-overlay hidden" id="debugOverlay"></pre>
 
   <div class="boss-hud hidden" id="bossHud">

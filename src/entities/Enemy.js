@@ -49,7 +49,9 @@ export class Enemy {
     if (this.fireTimer <= 0 && this.y > 35) {
       this.fire(game);
       const mobileFireScale = game.mobile ? BALANCE.mobile.hunterFireScale : 1;
-      this.fireTimer = Math.max(0.55, (this.config.fireRate * mobileFireScale) / this.fireRateScale);
+      const bulletLoad = game.enemyBullets.length / game.getPerformanceLimits().enemyBullets;
+      const loadScale = bulletLoad > 0.85 ? 1.35 : bulletLoad > 0.7 ? 1.16 : 1;
+      this.fireTimer = Math.max(0.55, (this.config.fireRate * mobileFireScale * loadScale) / this.fireRateScale);
     }
 
     if (this.config.carrier && this.y > 40) {
