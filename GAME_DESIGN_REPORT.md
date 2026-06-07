@@ -2225,3 +2225,39 @@ Cap nhat ngay 07/06/2026 theo yeu cau trong file TXT bugfix moi.
 - Can test tay Chrome/Edge: giu chuot trai, keo xuong taskbar, quay lai canvas va keo qua hai canh.
 - Can test 3 phut stage dong/Endless bang F3 tren may that de danh gia FPS sau pooling.
 - Can test Android Chrome va iPhone Safari tren thiet bi that.
+
+## 35. Bugfix Mobile Safari Zoom Va Viewport
+
+Cap nhat ngay 07/06/2026 theo yeu cau trong file TXT ve loi double tap/pinch zoom tren mobile.
+
+### Nguyen Nhan
+
+- iPhone Safari van co the zoom page khi double tap hoac pinch neu chi dung `touch-action` CSS va viewport meta chua day du.
+- Code cu moi chan `gesturestart`, chua chan `gesturechange`, `gestureend`, double-tap `touchend` va multi-touch `touchstart`.
+- Canvas da dung `visualViewport` mot phan, nhung CSS chua set `--app-width` va canvas fixed theo viewport that nen khi Safari address bar co/dan co the bi lech/khoang den.
+- UI button co the nhan touch rieng lam browser sinh zoom/click tong hop neu khong chan propagation o tang document.
+
+### Noi Dung Da Sua
+
+- `tools/build-standalone.js`: viewport meta doi thanh `width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover`; giu `<meta charset="UTF-8">`.
+- `styles/base.css`: `html/body` fixed full viewport, khoa overflow/overscroll/touch action, canvas `#game` fixed `inset: 0`, width theo `--app-width`, height theo `--app-height`.
+- `styles/menu.css`: menu scroll noi bo dung `--app-height` thay vi chi dua vao `100dvh`, them `touch-action: pan-y` cho menu.
+- `src/core/Game.js`: them `getViewportSize()`, `updateAppViewport()`, cap nhat `--app-height`, `--app-width`, viewport offset, resize debounce 120ms.
+- `src/core/Game.js`: lang nghe `resize`, `orientationchange`, `visualViewport.resize`, `visualViewport.scroll`, `focus`, `visibilitychange` de resize lai canvas.
+- `src/core/Game.js`: them guard `touchstart` multi-touch, `touchmove`, double-tap `touchend`, va `gesturestart/gesturechange/gestureend` voi `{ passive: false }`.
+- `src/core/Game.js`: them guard cho button UI quan trong: Thunder, Pause, Sound, Language, Start, Upgrade card, Hangar, Pause actions, ship card; touch button goi click chu dong de UI van hoat dong sau khi chan touch zoom.
+
+### Test Da Chay
+
+- `node --check src/core/Game.js`: pass.
+- `node --check src/core/Input.js`: pass.
+- `node --check tools/build-standalone.js`: pass.
+- `node tools/build-standalone.js`: pass, da tao lai `index.html` va `Sky-Thunder-Play.html`.
+- Static check xac nhan ca hai standalone co viewport meta moi, `gesturestart/gesturechange/gestureend`, double-tap `touchend`, `visualViewport`, `--app-height`, `--app-width`, canvas fixed full viewport.
+- `git diff --check`: pass, chi co canh bao LF/CRLF cua Windows.
+
+### Can Playtest Tren Thiet Bi That
+
+- iPhone Safari: double tap canvas, double tap Thunder/Pause/Sound/Language, pinch 2 ngon, keo may bay lien tuc, xoay ngang/doc, cho address bar co/dan.
+- Android Chrome: test cac case tuong tu.
+- Xac nhan canvas luon full man hinh, khong bi thu nho/lẹch trai, khong co khoang den ben phai, nut Thunder khong phong to bat thuong.

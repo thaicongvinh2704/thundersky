@@ -18,9 +18,10 @@
   backdrop-filter: blur(18px);
   text-align: center;
   pointer-events: auto;
-  max-height: min(86vh, 720px);
+  max-height: min(calc(var(--app-height, 100dvh) * 0.86), 720px);
   overflow: auto;
   overscroll-behavior: contain;
+  touch-action: pan-y;
   -webkit-overflow-scrolling: touch;
 }
 
@@ -229,7 +230,7 @@ h1 {
 
   .menu {
     width: min(420px, calc(100vw - 24px));
-    max-height: calc(100dvh - 28px);
+    max-height: calc(var(--app-height, 100dvh) - 28px);
     padding: 18px 16px;
   }
 
@@ -311,7 +312,7 @@ h1 {
 
   .menu {
     width: calc(100vw - 16px);
-    max-height: calc(100dvh - 18px);
+    max-height: calc(var(--app-height, 100dvh) - 18px);
     padding: 14px 12px;
   }
 
@@ -344,7 +345,7 @@ h1 {
 
 @media (min-width: 621px) and (max-height: 520px) {
   .menu {
-    max-height: calc(100dvh - 24px);
+    max-height: calc(var(--app-height, 100dvh) - 24px);
     padding: 18px;
   }
 

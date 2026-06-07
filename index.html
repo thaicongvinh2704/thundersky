@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover" />
   <title>Sky Thunder</title>
   <style>
 /* styles/base.css */
@@ -16,9 +16,13 @@ html,
 body {
   width: 100%;
   height: 100%;
+  margin: 0;
+  padding: 0;
   height: var(--app-height, 100dvh);
   min-height: 100dvh;
   overflow: hidden;
+  position: fixed;
+  inset: 0;
   overscroll-behavior: none;
   overscroll-behavior-x: none;
   overscroll-behavior-y: none;
@@ -33,27 +37,34 @@ body {
 }
 
 body {
-  position: fixed;
-  inset: 0;
   display: grid;
   place-items: center;
+  background: #06111f;
 }
 
-canvas {
-  width: 100vw;
-  height: 100vh;
-  height: 100dvh;
+#app,
+.game-shell,
+canvas,
+#game {
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+canvas,
+#game {
+  position: fixed;
+  inset: 0;
+  width: var(--app-width, 100vw);
   height: var(--app-height, 100dvh);
   display: block;
+  overflow: hidden;
   background:
     radial-gradient(circle at 30% 15%, rgba(95, 195, 255, 0.32), transparent 24%),
     radial-gradient(circle at 80% 72%, rgba(255, 188, 87, 0.18), transparent 28%),
     linear-gradient(180deg, #08172b 0%, #0b2d48 47%, #133f54 100%);
   cursor: crosshair;
-  touch-action: none;
-  user-select: none;
-  -webkit-user-select: none;
-  -webkit-touch-callout: none;
 }
 
 .hidden {
@@ -72,7 +83,27 @@ button {
   cursor: pointer;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
   box-shadow: 0 12px 32px rgba(127, 255, 208, 0.28);
+}
+
+.hud button,
+.mobile-button,
+.skill-button,
+.pause-button,
+.language-button,
+.mute-button,
+.sound-button,
+.hangar-button,
+.upgrade-card,
+.ship-card,
+.pause-action {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 
 button:disabled {
@@ -601,9 +632,10 @@ body.is-mobile.is-small-phone .boss-hud {
   backdrop-filter: blur(18px);
   text-align: center;
   pointer-events: auto;
-  max-height: min(86vh, 720px);
+  max-height: min(calc(var(--app-height, 100dvh) * 0.86), 720px);
   overflow: auto;
   overscroll-behavior: contain;
+  touch-action: pan-y;
   -webkit-overflow-scrolling: touch;
 }
 
@@ -812,7 +844,7 @@ h1 {
 
   .menu {
     width: min(420px, calc(100vw - 24px));
-    max-height: calc(100dvh - 28px);
+    max-height: calc(var(--app-height, 100dvh) - 28px);
     padding: 18px 16px;
   }
 
@@ -894,7 +926,7 @@ h1 {
 
   .menu {
     width: calc(100vw - 16px);
-    max-height: calc(100dvh - 18px);
+    max-height: calc(var(--app-height, 100dvh) - 18px);
     padding: 14px 12px;
   }
 
@@ -927,7 +959,7 @@ h1 {
 
 @media (min-width: 621px) and (max-height: 520px) {
   .menu {
-    max-height: calc(100dvh - 24px);
+    max-height: calc(var(--app-height, 100dvh) - 24px);
     padding: 18px;
   }
 
@@ -4183,15 +4215,22 @@ class Game {
     this.upgradeScreen = new UpgradeScreen(menu);
     this.gameOverScreen = new GameOverScreen(this.menu);
     this.lang = getLanguage();
+    this.lastTouchEnd = 0;
   }
 
   init() {
+    this.updateAppViewport();
     this.resize();
     window.addEventListener("resize", () => this.resizeSoon());
     window.addEventListener("orientationchange", () => this.resizeSoon());
     window.visualViewport?.addEventListener("resize", () => this.resizeSoon());
     window.visualViewport?.addEventListener("scroll", () => this.resizeSoon());
-    document.addEventListener("gesturestart", (event) => event.preventDefault());
+    window.addEventListener("focus", () => this.resizeSoon());
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) this.resizeSoon();
+    });
+    this.installGestureGuards();
+    this.installInteractiveGuards();
     this.input.onStart = () => {
       if (this.state.is(STATES.WIN)) this.continueEndless();
       else if (this.state.is(STATES.MENU) || this.state.is(STATES.GAME_OVER)) this.start();
@@ -4266,15 +4305,15 @@ class Game {
 
   resize() {
     this.updateMobileState();
+    const viewport = this.getViewportSize();
+    this.updateAppViewport(viewport);
     const caps = this.mobile
       ? { normal: 1.35, low: 1.15, critical: 1 }
       : { normal: 1.75, low: 1.35, critical: 1.15 };
     const cap = caps[this.performanceTier];
     this.dpr = Math.min(window.devicePixelRatio || 1, cap);
-    const viewport = window.visualViewport;
-    this.width = Math.max(1, Math.floor(viewport?.width || window.innerWidth));
-    this.height = Math.max(1, Math.floor(viewport?.height || window.innerHeight));
-    document.documentElement.style.setProperty("--app-height", `${this.height}px`);
+    this.width = Math.max(1, viewport.width);
+    this.height = Math.max(1, viewport.height);
     this.canvas.style.width = `${this.width}px`;
     this.canvas.style.height = `${this.height}px`;
     this.canvas.width = Math.floor(this.width * this.dpr);
@@ -4292,14 +4331,90 @@ class Game {
 
   resizeSoon() {
     clearTimeout(this.resizeTimer);
-    this.resizeTimer = setTimeout(() => this.resize(), 90);
+    this.updateAppViewport();
+    this.resizeTimer = setTimeout(() => this.resize(), 120);
+  }
+
+  getViewportSize() {
+    const viewport = window.visualViewport;
+    return {
+      width: Math.max(1, Math.round(viewport ? viewport.width : window.innerWidth)),
+      height: Math.max(1, Math.round(viewport ? viewport.height : window.innerHeight)),
+      offsetTop: Math.round(viewport ? viewport.offsetTop : 0),
+      offsetLeft: Math.round(viewport ? viewport.offsetLeft : 0)
+    };
+  }
+
+  updateAppViewport(size = this.getViewportSize()) {
+    document.documentElement.style.setProperty("--app-height", `${size.height}px`);
+    document.documentElement.style.setProperty("--app-width", `${size.width}px`);
+    document.documentElement.style.setProperty("--viewport-offset-top", `${size.offsetTop}px`);
+    document.documentElement.style.setProperty("--viewport-offset-left", `${size.offsetLeft}px`);
+  }
+
+  installGestureGuards() {
+    const block = (event) => event.preventDefault();
+    const shouldAllowMenuScroll = (event) => {
+      if (event.touches && event.touches.length > 1) return false;
+      const target = event.target instanceof Element ? event.target : null;
+      return Boolean(target?.closest(".menu"));
+    };
+    document.addEventListener("touchstart", (event) => {
+      if (event.touches && event.touches.length > 1) event.preventDefault();
+    }, { passive: false });
+    document.addEventListener("touchmove", (event) => {
+      if (!shouldAllowMenuScroll(event)) event.preventDefault();
+    }, { passive: false });
+    document.addEventListener("touchend", (event) => {
+      const now = Date.now();
+      if (now - this.lastTouchEnd <= 350) event.preventDefault();
+      this.lastTouchEnd = now;
+    }, { passive: false });
+    window.addEventListener("gesturestart", block, { passive: false });
+    window.addEventListener("gesturechange", block, { passive: false });
+    window.addEventListener("gestureend", block, { passive: false });
+  }
+
+  installInteractiveGuards() {
+    const selector = [
+      "button",
+      ".skill-button",
+      ".pause-button",
+      ".mute-button",
+      ".language-button",
+      ".hangar-button",
+      ".upgrade-card",
+      ".ship-card",
+      ".pause-action"
+    ].join(",");
+    const isGuarded = (target) => target instanceof Element && target.closest(selector);
+    document.addEventListener("pointerdown", (event) => {
+      if (!isGuarded(event.target)) return;
+      event.preventDefault();
+      event.stopPropagation();
+    }, { passive: false, capture: true });
+    document.addEventListener("touchstart", (event) => {
+      if (!isGuarded(event.target)) return;
+      event.preventDefault();
+      event.stopPropagation();
+    }, { passive: false, capture: true });
+    document.addEventListener("touchend", (event) => {
+      if (!isGuarded(event.target)) return;
+      event.preventDefault();
+      event.stopPropagation();
+      const button = event.target.closest("button");
+      if (button && !button.disabled) button.click();
+    }, { passive: false, capture: true });
+    document.addEventListener("click", (event) => {
+      if (isGuarded(event.target)) event.stopPropagation();
+    });
   }
 
   updateMobileState() {
     const coarse = window.matchMedia?.("(pointer: coarse)")?.matches || false;
-    const viewport = window.visualViewport;
-    const vw = viewport?.width || window.innerWidth;
-    const vh = viewport?.height || window.innerHeight;
+    const viewport = this.getViewportSize();
+    const vw = viewport.width;
+    const vh = viewport.height;
     const shortSide = Math.min(vw, vh);
     const longSide = Math.max(vw, vh);
     const narrow = shortSide <= 760;

@@ -72,15 +72,22 @@ export class Game {
     this.upgradeScreen = new UpgradeScreen(menu);
     this.gameOverScreen = new GameOverScreen(this.menu);
     this.lang = getLanguage();
+    this.lastTouchEnd = 0;
   }
 
   init() {
+    this.updateAppViewport();
     this.resize();
     window.addEventListener("resize", () => this.resizeSoon());
     window.addEventListener("orientationchange", () => this.resizeSoon());
     window.visualViewport?.addEventListener("resize", () => this.resizeSoon());
     window.visualViewport?.addEventListener("scroll", () => this.resizeSoon());
-    document.addEventListener("gesturestart", (event) => event.preventDefault());
+    window.addEventListener("focus", () => this.resizeSoon());
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) this.resizeSoon();
+    });
+    this.installGestureGuards();
+    this.installInteractiveGuards();
     this.input.onStart = () => {
       if (this.state.is(STATES.WIN)) this.continueEndless();
       else if (this.state.is(STATES.MENU) || this.state.is(STATES.GAME_OVER)) this.start();
@@ -155,15 +162,15 @@ export class Game {
 
   resize() {
     this.updateMobileState();
+    const viewport = this.getViewportSize();
+    this.updateAppViewport(viewport);
     const caps = this.mobile
       ? { normal: 1.35, low: 1.15, critical: 1 }
       : { normal: 1.75, low: 1.35, critical: 1.15 };
     const cap = caps[this.performanceTier];
     this.dpr = Math.min(window.devicePixelRatio || 1, cap);
-    const viewport = window.visualViewport;
-    this.width = Math.max(1, Math.floor(viewport?.width || window.innerWidth));
-    this.height = Math.max(1, Math.floor(viewport?.height || window.innerHeight));
-    document.documentElement.style.setProperty("--app-height", `${this.height}px`);
+    this.width = Math.max(1, viewport.width);
+    this.height = Math.max(1, viewport.height);
     this.canvas.style.width = `${this.width}px`;
     this.canvas.style.height = `${this.height}px`;
     this.canvas.width = Math.floor(this.width * this.dpr);
@@ -181,14 +188,90 @@ export class Game {
 
   resizeSoon() {
     clearTimeout(this.resizeTimer);
-    this.resizeTimer = setTimeout(() => this.resize(), 90);
+    this.updateAppViewport();
+    this.resizeTimer = setTimeout(() => this.resize(), 120);
+  }
+
+  getViewportSize() {
+    const viewport = window.visualViewport;
+    return {
+      width: Math.max(1, Math.round(viewport ? viewport.width : window.innerWidth)),
+      height: Math.max(1, Math.round(viewport ? viewport.height : window.innerHeight)),
+      offsetTop: Math.round(viewport ? viewport.offsetTop : 0),
+      offsetLeft: Math.round(viewport ? viewport.offsetLeft : 0)
+    };
+  }
+
+  updateAppViewport(size = this.getViewportSize()) {
+    document.documentElement.style.setProperty("--app-height", `${size.height}px`);
+    document.documentElement.style.setProperty("--app-width", `${size.width}px`);
+    document.documentElement.style.setProperty("--viewport-offset-top", `${size.offsetTop}px`);
+    document.documentElement.style.setProperty("--viewport-offset-left", `${size.offsetLeft}px`);
+  }
+
+  installGestureGuards() {
+    const block = (event) => event.preventDefault();
+    const shouldAllowMenuScroll = (event) => {
+      if (event.touches && event.touches.length > 1) return false;
+      const target = event.target instanceof Element ? event.target : null;
+      return Boolean(target?.closest(".menu"));
+    };
+    document.addEventListener("touchstart", (event) => {
+      if (event.touches && event.touches.length > 1) event.preventDefault();
+    }, { passive: false });
+    document.addEventListener("touchmove", (event) => {
+      if (!shouldAllowMenuScroll(event)) event.preventDefault();
+    }, { passive: false });
+    document.addEventListener("touchend", (event) => {
+      const now = Date.now();
+      if (now - this.lastTouchEnd <= 350) event.preventDefault();
+      this.lastTouchEnd = now;
+    }, { passive: false });
+    window.addEventListener("gesturestart", block, { passive: false });
+    window.addEventListener("gesturechange", block, { passive: false });
+    window.addEventListener("gestureend", block, { passive: false });
+  }
+
+  installInteractiveGuards() {
+    const selector = [
+      "button",
+      ".skill-button",
+      ".pause-button",
+      ".mute-button",
+      ".language-button",
+      ".hangar-button",
+      ".upgrade-card",
+      ".ship-card",
+      ".pause-action"
+    ].join(",");
+    const isGuarded = (target) => target instanceof Element && target.closest(selector);
+    document.addEventListener("pointerdown", (event) => {
+      if (!isGuarded(event.target)) return;
+      event.preventDefault();
+      event.stopPropagation();
+    }, { passive: false, capture: true });
+    document.addEventListener("touchstart", (event) => {
+      if (!isGuarded(event.target)) return;
+      event.preventDefault();
+      event.stopPropagation();
+    }, { passive: false, capture: true });
+    document.addEventListener("touchend", (event) => {
+      if (!isGuarded(event.target)) return;
+      event.preventDefault();
+      event.stopPropagation();
+      const button = event.target.closest("button");
+      if (button && !button.disabled) button.click();
+    }, { passive: false, capture: true });
+    document.addEventListener("click", (event) => {
+      if (isGuarded(event.target)) event.stopPropagation();
+    });
   }
 
   updateMobileState() {
     const coarse = window.matchMedia?.("(pointer: coarse)")?.matches || false;
-    const viewport = window.visualViewport;
-    const vw = viewport?.width || window.innerWidth;
-    const vh = viewport?.height || window.innerHeight;
+    const viewport = this.getViewportSize();
+    const vw = viewport.width;
+    const vh = viewport.height;
     const shortSide = Math.min(vw, vh);
     const longSide = Math.max(vw, vh);
     const narrow = shortSide <= 760;
