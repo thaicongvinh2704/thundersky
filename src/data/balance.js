@@ -1,0 +1,50 @@
+export const BALANCE = {
+  player: {
+    speed: 450,
+    radius: 19,
+    maxHealth: 100,
+    baseCooldown: 0.13,
+    bulletSpeed: 820
+  },
+  mobile: {
+    dprCap: 1.4,
+    lowFpsDprCap: 1.25,
+    lowFpsThreshold: 44,
+    topSafeArea: 104,
+    bottomSafeArea: 126,
+    touchOffsetY: -84,
+    touchDragScale: 1.18,
+    followSmoothing: 16,
+    initialFollowSmoothing: 7,
+    maxInitialStep: 132,
+    deadZone: 5,
+    maxParticles: 200,
+    enemyBulletCap: 205,
+    powerUpCap: 16,
+    starScale: 0.54,
+    cloudScale: 0.56,
+    cloudCap: 9,
+    shakeScale: 0.62,
+    enemyBulletScale: 0.88,
+    densityScale: 0.76,
+    spawnIntervalScale: 1.2,
+    endlessDifficultyScale: 0.82,
+    hunterDashWarn: 1.05,
+    hunterDashSpeed: 500,
+    hunterDashY: 116,
+    hunterFireScale: 1.12,
+    smallScreenEnemyScale: 0.94
+  },
+  thunder: {
+    maxEnergy: 100,
+    cost: 100,
+    cooldown: 5.8,
+    radius: 620,
+    enemyDamage: 18,
+    bossDamage: 120,
+    chargePerKill: 7,
+    chargePerPickup: 28
+  },
+  stageClearDelay: 0.85,
+  missileInterval: 3.4
+};
