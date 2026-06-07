@@ -1,6 +1,7 @@
 .hud {
   position: fixed;
   inset: 0;
+  z-index: 6;
   pointer-events: none;
   padding: 18px;
   display: flex;
@@ -57,6 +58,28 @@
   line-height: 1.2;
 }
 
+.health-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 18px;
+  margin-top: 3px;
+  color: #f7fff9;
+  font-size: 13px;
+  font-weight: 900;
+  line-height: 1;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.72);
+}
+
+.health-text-warning {
+  color: #ffe66d;
+}
+
+.health-text-danger {
+  color: #ffffff;
+  text-shadow: 0 0 12px rgba(255, 65, 65, 0.95), 0 2px 10px rgba(0, 0, 0, 0.78);
+}
+
 .combo-bar {
   width: 100%;
   height: 5px;
@@ -85,12 +108,83 @@
   background: rgba(255, 255, 255, 0.09);
 }
 
+.health-bar {
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.48);
+  background: rgba(8, 8, 12, 0.72);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.65), inset 0 0 12px rgba(0, 0, 0, 0.65);
+}
+
 .fill {
   width: 100%;
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, #53f4a8, #ffe66d, #ff6a6a);
+  background: linear-gradient(90deg, #24ff8d, #b4ff5f);
   transition: width 120ms linear;
+  box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.35), 0 0 14px rgba(36, 255, 141, 0.45);
+}
+
+.health-fill-warning {
+  background: linear-gradient(90deg, #ffe66d, #ff9f43);
+  box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.38), 0 0 16px rgba(255, 190, 64, 0.75);
+}
+
+.health-fill-danger {
+  background: linear-gradient(90deg, #ff5c5c, #ff1f4f);
+  box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.42), 0 0 18px rgba(255, 45, 75, 0.95);
+}
+
+.health-fill-critical {
+  background: linear-gradient(90deg, #ffffff, #ff1f4f 38%, #b00024);
+  box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.55), 0 0 22px rgba(255, 30, 60, 1);
+  animation: healthPulse 0.48s infinite alternate;
+}
+
+.health-warning {
+  border-color: rgba(255, 230, 109, 0.72);
+}
+
+.health-bar.health-danger,
+.health-bar.health-critical {
+  border-color: rgba(255, 80, 80, 0.95);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.72), 0 0 18px rgba(255, 50, 50, 0.72), inset 0 0 12px rgba(0, 0, 0, 0.72);
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  opacity: 0;
+  border: 0 solid rgba(255, 45, 45, 0);
+  box-shadow: inset 0 0 0 rgba(255, 45, 45, 0);
+  transition: opacity 120ms linear, border-width 120ms linear;
+}
+
+body.health-danger::after {
+  opacity: 0.42;
+  border-width: 5px;
+  border-color: rgba(255, 45, 45, 0.78);
+  box-shadow: inset 0 0 58px rgba(255, 25, 25, 0.24);
+}
+
+body.health-critical::after,
+body.damage-flash::after {
+  opacity: 0.72;
+  border-width: 7px;
+  border-color: rgba(255, 30, 30, 0.95);
+  box-shadow: inset 0 0 86px rgba(255, 0, 0, 0.38);
+}
+
+@keyframes healthPulse {
+  from {
+    filter: brightness(1);
+  }
+
+  to {
+    filter: brightness(1.55);
+  }
 }
 
 .energy-bar {
@@ -376,6 +470,12 @@ body.is-mobile .power-timers {
   font-size: 9px;
 }
 
+body.is-mobile .health-row {
+  min-height: 16px;
+  margin-top: 2px;
+  font-size: 11px;
+}
+
 body.is-mobile .combo-bar {
   height: 4px;
   margin-top: 4px;
@@ -385,6 +485,12 @@ body.is-mobile .bar {
   width: 100%;
   height: 7px;
   margin: 4px 0 5px;
+}
+
+body.is-mobile .health-bar {
+  height: 13px;
+  margin: 3px 0 5px;
+  border-width: 2px;
 }
 
 body.is-mobile .boss-hud {

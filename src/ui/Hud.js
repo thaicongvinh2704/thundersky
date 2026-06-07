@@ -18,7 +18,26 @@ export class Hud {
         ? `${t("hud.endless")} ${Math.floor(game.endless.time)}s | x${game.endless.multiplier.toFixed(2)}`
         : `${t("hud.bestEndless")} ${Math.floor(game.save.best.endlessTime || 0)}s`;
     }
-    this.elements.health.style.width = `${Math.max(0, (player.health / player.maxHealth) * 100)}%`;
+    const healthRatio = Math.max(0, Math.min(1, player.health / player.maxHealth));
+    this.elements.health.style.width = `${healthRatio * 100}%`;
+    this.elements.health.classList.toggle("health-fill-warning", healthRatio <= 0.45 && healthRatio > 0.25);
+    this.elements.health.classList.toggle("health-fill-danger", healthRatio <= 0.25 && healthRatio > 0.12);
+    this.elements.health.classList.toggle("health-fill-critical", healthRatio <= 0.12);
+    const healthBar = this.elements.health.closest(".bar");
+    if (healthBar) {
+      healthBar.classList.toggle("health-warning", healthRatio <= 0.45 && healthRatio > 0.25);
+      healthBar.classList.toggle("health-danger", healthRatio <= 0.25 && healthRatio > 0.12);
+      healthBar.classList.toggle("health-critical", healthRatio <= 0.12);
+    }
+    if (this.elements.healthText) {
+      this.elements.healthText.textContent = `${Math.max(0, Math.ceil(player.health))} / ${Math.ceil(player.maxHealth)}`;
+      this.elements.healthText.classList.toggle("health-text-warning", healthRatio <= 0.45 && healthRatio > 0.25);
+      this.elements.healthText.classList.toggle("health-text-danger", healthRatio <= 0.25);
+    }
+    const activeHealthState = game.state.is(game.states.PLAYING) || game.state.is(game.states.BOSS) || game.state.is(game.states.ENDLESS);
+    document.body.classList.toggle("health-danger", activeHealthState && healthRatio <= 0.25);
+    document.body.classList.toggle("health-critical", activeHealthState && healthRatio <= 0.12);
+    document.body.classList.toggle("damage-flash", activeHealthState && game.damageFlash > 0);
     this.elements.stage.textContent = stage ? `${t("hud.stage")} ${stage.id}` : t("hud.stage");
     this.elements.time.textContent = stage && !stage.boss ? `${Math.ceil(game.stageSystem.timer)}s` : t("hud.boss");
     if (this.elements.energy) this.elements.energy.style.width = `${Math.max(0, (player.energy / 100) * 100)}%`;

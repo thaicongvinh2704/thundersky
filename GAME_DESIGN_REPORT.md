@@ -2284,3 +2284,31 @@ Cap nhat ngay 07/06/2026 sau khi phat hien mobile khong bam duoc nut Bao Sam.
 - `node --check src/ui/Hud.js`: pass.
 - `node --check tools/build-standalone.js`: pass.
 - `node tools/build-standalone.js`: pass.
+
+## 37. Hotfix Do Ro Thanh Mau Va Canh Bao Sap Chet
+
+Cap nhat ngay 07/06/2026 sau khi playtest thay thanh mau qua mo, khi gan chet nguoi choi kho nhan ra.
+
+### Nguyen Nhan
+
+- Thanh mau mobile chi cao khoang 7px, mau gradient cu khong tao du khac biet khi HP thap.
+- HUD chi hien bar, khong co so HP cu the.
+- Khi bi danh hoac mau xuong thap, game chua co canh bao toan man hinh nen nguoi choi dang tap trung ne dan de bo sot.
+
+### Da Sua
+
+- `tools/build-standalone.js`: them `healthText` hien so HP hien tai/toi da trong HUD.
+- `src/main.js`: bind DOM `#healthText`.
+- `src/ui/Hud.js`: cap nhat so HP, them class warning/danger/critical theo ti le mau.
+- `src/core/Game.js`: them `damageFlash` ngan khi nhan damage.
+- `styles/hud.css`: thanh mau day va sang hon; HP thap doi sang vang/cam, nguy hiem doi do, critical nhap nhay.
+- `styles/hud.css`: them vien/overlay do nhe khi mau thap hoac vua bi danh de nguoi choi nhan ra ngay.
+- Build lai `index.html` va `Sky-Thunder-Play.html`.
+
+### Test Da Chay
+
+- `node --check src/core/Game.js`: pass.
+- `node --check src/ui/Hud.js`: pass.
+- `node --check src/main.js`: pass.
+- `node --check tools/build-standalone.js`: pass.
+- `node tools/build-standalone.js`: pass.

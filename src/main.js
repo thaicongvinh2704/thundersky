@@ -10,6 +10,7 @@ const game = new Game({
     comboFill: document.getElementById("comboFill"),
     endlessText: document.getElementById("endlessText"),
     health: document.getElementById("health"),
+    healthText: document.getElementById("healthText"),
     energy: document.getElementById("energy"),
     energyText: document.getElementById("energyText"),
     powerTimers: document.getElementById("powerTimers"),

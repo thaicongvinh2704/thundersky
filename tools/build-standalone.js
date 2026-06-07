@@ -87,7 +87,8 @@ ${styles}
 
     <div class="panel status-panel">
       <div class="label" data-i18n="hud.health">Máu</div>
-      <div class="bar"><div class="fill" id="health"></div></div>
+      <div class="health-row"><span id="healthText">100 / 100</span></div>
+      <div class="bar health-bar"><div class="fill" id="health"></div></div>
       <div class="label" id="energyText">Thunder 0%</div>
       <div class="bar energy-bar"><div class="energy-fill" id="energy"></div></div>
       <div class="power-timers hidden" id="powerTimers"></div>

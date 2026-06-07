@@ -46,6 +46,7 @@ export class Game {
     this.debug = { visible: false, fps: 60, averageFps: 60, frames: 0, elapsed: 0 };
     this.performanceTier = "normal";
     this.performanceSamples = { lowSeconds: 0, criticalSeconds: 0, recoverySeconds: 0 };
+    this.damageFlash = 0;
     this.stageResult = null;
     this.mobile = false;
     this.layout = {
@@ -332,6 +333,7 @@ export class Game {
   reset() {
     this.score = 0;
     this.shake = 0;
+    this.damageFlash = 0;
     this.stats = { enemiesDestroyed: 0, stageReached: 1, maxCombo: 1, endlessTime: 0, stageHits: 0, totalHits: 0, bossTime: 0, stageKills: 0, stageDamageTaken: 0, creditsEarned: 0 };
     this.combo = { count: 0, multiplier: 1, timer: 0, maxTimer: 3.2 };
     this.endless = { active: false, time: 0, multiplier: 1, survivalBonusTimer: 0 };
@@ -399,6 +401,7 @@ export class Game {
 
   update(dt) {
     this.shake = Math.max(0, this.shake - dt * 35);
+    this.damageFlash = Math.max(0, this.damageFlash - dt);
     this.effects.update(dt);
 
     this.updateCombo(dt);
@@ -720,6 +723,7 @@ export class Game {
 
   recordDamageTaken(amount) {
     this.stats.stageDamageTaken += Math.max(0, amount);
+    this.damageFlash = Math.max(this.damageFlash, amount > 0 ? 0.5 : 0.25);
   }
 
   checkGraze(bullet) {
