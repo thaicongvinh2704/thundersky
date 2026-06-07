@@ -1,6 +1,3 @@
-import { Bullet } from "./Bullet.js";
-import { Enemy } from "./Enemy.js";
-
 export class Boss {
   constructor(width) {
     this.x = width / 2;
@@ -31,8 +28,8 @@ export class Boss {
     if (this.phase >= 2) {
       this.summonTimer -= dt;
       if (this.summonTimer <= 0) {
-        game.enemies.push(new Enemy("scout", this.x - 90, this.y + 25, 5));
-        game.enemies.push(new Enemy("fighter", this.x + 90, this.y + 25, 5));
+        game.addEnemy("scout", this.x - 90, this.y + 25, 5);
+        game.addEnemy("fighter", this.x + 90, this.y + 25, 5);
         this.summonTimer = 8;
       }
     }
@@ -60,6 +57,7 @@ export class Boss {
   }
 
   fire(game) {
+    if (game.enemyBullets.length >= game.getPerformanceLimits().enemyBullets) return;
     const count = this.phase === 1 ? 3 : this.phase === 2 ? 7 : 9;
     const spread = this.phase === 1 ? 0.34 : this.phase === 2 ? 0.72 : 0.95;
     const base = Math.atan2(game.player.y - this.y, game.player.x - this.x);
@@ -67,7 +65,7 @@ export class Boss {
       const t = count === 1 ? 0 : i / (count - 1) - 0.5;
       const angle = base + t * spread;
       const speed = this.phase === 3 ? 260 : 220;
-      game.enemyBullets.push(new Bullet({
+      if (!game.addEnemyBullet({
         x: this.x,
         y: this.y + this.r * 0.55,
         vx: Math.cos(angle) * speed,
@@ -77,7 +75,7 @@ export class Boss {
         life: 5,
         owner: "enemy",
         color: "#ff6a4f"
-      }));
+      })) break;
     }
   }
 
@@ -87,11 +85,11 @@ export class Boss {
     return this.hp <= 0;
   }
 
-  draw(ctx, height) {
+  draw(ctx, height, game = null) {
     ctx.save();
     ctx.translate(this.x, this.y);
     ctx.shadowColor = "rgba(255,106,106,0.45)";
-    ctx.shadowBlur = 25;
+    ctx.shadowBlur = game?.performanceTier === "critical" ? 0 : game?.performanceTier === "low" ? 9 : 25;
     ctx.fillStyle = this.hitFlash > 0 ? "#ffffff" : this.phase === 3 ? "#ff6a6a" : this.phase === 2 ? "#ffcf5d" : "#aeb8c6";
     ctx.strokeStyle = "#fff4c5";
     ctx.lineWidth = 3;

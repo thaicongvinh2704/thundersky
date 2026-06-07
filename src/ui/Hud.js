@@ -15,11 +15,11 @@ export class Hud {
     if (this.elements.comboFill) this.elements.comboFill.style.width = `${Math.max(0, Math.min(1, game.combo.timer / game.combo.maxTimer)) * 100}%`;
     if (this.elements.endlessText) {
       this.elements.endlessText.textContent = game.state.is(game.states.ENDLESS)
-        ? `Endless ${Math.floor(game.endless.time)}s | x${game.endless.multiplier.toFixed(2)}`
-        : `Best Endless ${Math.floor(game.save.best.endlessTime || 0)}s`;
+        ? `${t("hud.endless")} ${Math.floor(game.endless.time)}s | x${game.endless.multiplier.toFixed(2)}`
+        : `${t("hud.bestEndless")} ${Math.floor(game.save.best.endlessTime || 0)}s`;
     }
     this.elements.health.style.width = `${Math.max(0, (player.health / player.maxHealth) * 100)}%`;
-    this.elements.stage.textContent = stage ? stage.name : t("hud.stage");
+    this.elements.stage.textContent = stage ? `${t("hud.stage")} ${stage.id}` : t("hud.stage");
     this.elements.time.textContent = stage && !stage.boss ? `${Math.ceil(game.stageSystem.timer)}s` : t("hud.boss");
     if (this.elements.energy) this.elements.energy.style.width = `${Math.max(0, (player.energy / 100) * 100)}%`;
     if (this.elements.energyText) {
@@ -29,8 +29,8 @@ export class Hud {
     }
     if (this.elements.powerTimers) {
       const timers = [];
-      if (player.rapidTimer > 0) timers.push(`Rapid ${Math.ceil(player.rapidTimer)}s`);
-      if (player.magnetTimer > 0) timers.push(`Magnet ${Math.ceil(player.magnetTimer)}s`);
+      if (player.rapidTimer > 0) timers.push(`${t("power.rapidTimer")} ${Math.ceil(player.rapidTimer)}s`);
+      if (player.magnetTimer > 0) timers.push(`${t("power.magnetTimer")} ${Math.ceil(player.magnetTimer)}s`);
       this.elements.powerTimers.textContent = timers.join(" | ");
       this.elements.powerTimers.classList.toggle("hidden", timers.length === 0);
     }

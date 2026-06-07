@@ -11,7 +11,22 @@ const POWER_UP_META = {
 };
 
 export class PowerUp {
-  constructor(x, y, type = "energy") {
+  static pool = [];
+
+  static acquire(x, y, type = "energy") {
+    return (this.pool.pop() || new PowerUp()).reset(x, y, type);
+  }
+
+  static release(powerUp) {
+    if (!powerUp || this.pool.length >= 24) return;
+    this.pool.push(powerUp);
+  }
+
+  constructor(x = 0, y = 0, type = "energy") {
+    this.reset(x, y, type);
+  }
+
+  reset(x, y, type = "energy") {
     this.x = x;
     this.y = y;
     this.vx = (Math.random() - 0.5) * 70;
@@ -20,6 +35,7 @@ export class PowerUp {
     this.type = type;
     this.spin = Math.random() * Math.PI * 2;
     this.life = 8;
+    return this;
   }
 
   update(dt, game = null) {
@@ -58,26 +74,30 @@ export class PowerUp {
     ctx.save();
     ctx.translate(this.x, this.y);
     ctx.rotate(this.spin);
-    ctx.globalCompositeOperation = "lighter";
+    const critical = game?.performanceTier === "critical";
+    const low = game?.performanceTier === "low";
+    ctx.globalCompositeOperation = critical ? "source-over" : "lighter";
     const weapon = this.weapon();
     const meta = this.meta();
     const color = weapon ? weapon.color : meta.color;
     const pulse = 1 + Math.sin(performance.now() / 130 + this.spin) * 0.08;
-    const glow = ctx.createRadialGradient(0, 0, 0, 0, 0, 36 * pulse);
-    glow.addColorStop(0, "rgba(255,255,255,0.95)");
-    glow.addColorStop(0.34, color);
-    glow.addColorStop(1, "rgba(0,0,0,0)");
-    ctx.fillStyle = glow;
-    ctx.beginPath();
-    ctx.arc(0, 0, 34 * pulse, 0, Math.PI * 2);
-    ctx.fill();
+    if (!critical) {
+      const glow = ctx.createRadialGradient(0, 0, 0, 0, 0, (low ? 24 : 36) * pulse);
+      glow.addColorStop(0, "rgba(255,255,255,0.95)");
+      glow.addColorStop(0.34, color);
+      glow.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.arc(0, 0, (low ? 23 : 34) * pulse, 0, Math.PI * 2);
+      ctx.fill();
+    }
     ctx.fillStyle = "rgba(5,18,32,0.82)";
     ctx.strokeStyle = color;
     ctx.lineWidth = 3;
     this.drawShape(ctx, meta.shape);
     ctx.rotate(-this.spin);
     ctx.fillStyle = color;
-    ctx.font = "800 13px Arial";
+    ctx.font = '800 13px Inter, system-ui, "Segoe UI", Arial, "Noto Sans", sans-serif';
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillText(this.shortLabel(), 0, 0);
@@ -85,14 +105,14 @@ export class PowerUp {
     const mobile = Boolean(game?.mobile);
     const main = this.label(game);
     const sub = this.subLabel(game);
-    ctx.font = `800 ${mobile ? 8 : 10}px Arial`;
+    ctx.font = `800 ${mobile ? 8 : 10}px Inter, system-ui, "Segoe UI", Arial, "Noto Sans", sans-serif`;
     ctx.lineWidth = mobile ? 2 : 3;
     ctx.strokeStyle = "rgba(5,18,32,0.9)";
     ctx.fillStyle = color;
     ctx.strokeText(main, 0, 30);
     ctx.fillText(main, 0, 30);
     if (sub) {
-      ctx.font = `800 ${mobile ? 7 : 8}px Arial`;
+      ctx.font = `800 ${mobile ? 7 : 8}px Inter, system-ui, "Segoe UI", Arial, "Noto Sans", sans-serif`;
       ctx.strokeText(sub, 0, 40);
       ctx.fillText(sub, 0, 40);
     }

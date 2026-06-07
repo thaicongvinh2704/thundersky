@@ -12,15 +12,15 @@ export class Renderer {
     }
 
     this.drawBackground(time);
-    for (const bullet of game.playerBullets) bullet.draw(ctx);
+    for (const bullet of game.playerBullets) bullet.draw(ctx, game);
     for (const powerUp of game.powerUps) powerUp.draw(ctx, game);
-    for (const enemy of game.enemies) enemy.draw(ctx);
-    if (game.boss) game.boss.draw(ctx, game.height);
-    for (const bullet of game.enemyBullets) bullet.draw(ctx);
-    game.player.draw(ctx);
+    for (const enemy of game.enemies) enemy.draw(ctx, game);
+    if (game.boss) game.boss.draw(ctx, game.height, game);
+    for (const bullet of game.enemyBullets) bullet.draw(ctx, game);
+    game.player.draw(ctx, game);
     this.drawLightnings();
     this.drawIndicators();
-    for (const particle of game.effects.particles) particle.draw(ctx);
+    for (const particle of game.effects.particles) particle.draw(ctx, game);
     this.drawMessages();
     ctx.restore();
   }
@@ -45,21 +45,25 @@ export class Renderer {
     }
     ctx.restore();
 
-    for (const cloud of game.effects.clouds) this.drawCloud(cloud);
-
-    ctx.save();
-    ctx.globalAlpha = 0.22;
-    ctx.strokeStyle = "#76d8ff";
-    ctx.lineWidth = 1;
-    const streaks = Math.max(2, Math.ceil((game.mobile ? 5 : 9) * game.getEffectScale()));
-    for (let i = 0; i < streaks; i++) {
-      const x = ((time * 0.035 + i * 170) % (game.width + 220)) - 110;
-      ctx.beginPath();
-      ctx.moveTo(x, game.height * 0.08);
-      ctx.quadraticCurveTo(x + 60, game.height * 0.38, x - 20, game.height + 40);
-      ctx.stroke();
+    if (game.performanceTier !== "critical") {
+      for (const cloud of game.effects.clouds) this.drawCloud(cloud);
     }
-    ctx.restore();
+
+    if (game.performanceTier !== "critical") {
+      ctx.save();
+      ctx.globalAlpha = game.performanceTier === "low" ? 0.1 : 0.22;
+      ctx.strokeStyle = "#76d8ff";
+      ctx.lineWidth = 1;
+      const streaks = Math.max(2, Math.ceil((game.mobile ? 5 : 9) * game.getEffectScale()));
+      for (let i = 0; i < streaks; i++) {
+        const x = ((time * 0.035 + i * 170) % (game.width + 220)) - 110;
+        ctx.beginPath();
+        ctx.moveTo(x, game.height * 0.08);
+        ctx.quadraticCurveTo(x + 60, game.height * 0.38, x - 20, game.height + 40);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
   }
 
   drawCloud(cloud) {
@@ -108,7 +112,7 @@ export class Renderer {
     const { ctx, game } = this;
     ctx.save();
     ctx.textAlign = "center";
-    ctx.font = game.mobile ? "800 18px Arial, sans-serif" : "800 24px Arial, sans-serif";
+    ctx.font = game.mobile ? '800 18px Inter, system-ui, "Segoe UI", Arial, "Noto Sans", sans-serif' : '800 24px Inter, system-ui, "Segoe UI", Arial, "Noto Sans", sans-serif';
     for (let i = 0; i < game.effects.messages.length; i++) {
       const message = game.effects.messages[i];
       const alpha = Math.max(0, Math.min(1, message.life / message.maxLife));
@@ -128,7 +132,7 @@ export class Renderer {
     ctx.save();
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.font = game.mobile ? "800 13px Arial, sans-serif" : "800 15px Arial, sans-serif";
+    ctx.font = game.mobile ? '800 13px Inter, system-ui, "Segoe UI", Arial, "Noto Sans", sans-serif' : '800 15px Inter, system-ui, "Segoe UI", Arial, "Noto Sans", sans-serif';
     for (const indicator of game.effects.indicators) {
       const alpha = Math.max(0, Math.min(1, indicator.life / indicator.maxLife));
       const marginTop = game.mobile ? game.layout.topSafeArea + 12 : 18;

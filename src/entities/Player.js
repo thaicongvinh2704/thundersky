@@ -1,4 +1,3 @@
-import { Bullet } from "./Bullet.js";
 import { BALANCE } from "../data/balance.js";
 import { WEAPONS } from "../data/weapons.js";
 import { getShip } from "../data/ships.js";
@@ -162,7 +161,7 @@ export class Player {
       const radiusBonus = weapon.id === "plasma" ? (level - 1) * 0.75 : (level - 1) * 0.35;
       const pierceBonus = weapon.id === "laser" ? level - 1 : weapon.id === "plasma" && level >= 3 ? 1 : 0;
       const splashBonus = weapon.id === "flak" ? (level - 1) * 14 : 0;
-      game.playerBullets.push(new Bullet({
+      game.addPlayerBullet({
         x: this.x + angle * 64,
         y: this.y - 28,
         vx: Math.sin(angle) * speed,
@@ -175,7 +174,7 @@ export class Player {
         pierce: (weapon.pierce || 0) + pierceBonus,
         splash: (weapon.splash || 0) + splashBonus,
         shape: weapon.shape || "orb"
-      }));
+      });
     }
     game.effects.burst(this.x, this.y - 28, weapon.color, 5 + spread + Math.floor(angles.length / 2), 140, 0.22);
     game.audio.play("shoot");
@@ -200,7 +199,7 @@ export class Player {
     this.missileTimer -= dt;
     if (this.missileTimer > 0) return;
     this.missileTimer = Math.max(1.0, BALANCE.missileInterval - this.stats.missile * 0.45);
-    game.playerBullets.push(new Bullet({
+    game.addPlayerBullet({
       x: this.x,
       y: this.y - 18,
       vx: 0,
@@ -210,7 +209,7 @@ export class Player {
       life: 4,
       color: "#ffe66d",
       homing: true
-    }));
+    });
     game.audio.play("shoot");
   }
 
@@ -245,7 +244,7 @@ export class Player {
     if (this.health <= 0) game.gameOver();
   }
 
-  draw(ctx) {
+  draw(ctx, game = null) {
     ctx.save();
     ctx.translate(this.x, this.y);
     if (this.invincible > 0 && Math.floor(this.invincible * 18) % 2 === 0) ctx.globalAlpha = 0.58;
@@ -273,7 +272,7 @@ export class Player {
     const shipColor = this.ship.color || "#77e7ff";
     const shipAccent = this.ship.accent || "#d9f5ff";
     ctx.shadowColor = shipColor;
-    ctx.shadowBlur = 18;
+    ctx.shadowBlur = game?.performanceTier === "critical" ? 0 : game?.performanceTier === "low" ? 7 : 18;
     ctx.fillStyle = shipColor;
     ctx.strokeStyle = shipAccent;
     ctx.lineWidth = 2;

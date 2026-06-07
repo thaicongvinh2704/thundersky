@@ -179,7 +179,7 @@ body:has(.pause-mode) .control-dock {
   border: 0;
   box-shadow: none;
   text-align: left;
-  font: 700 11px/1.2 Arial, sans-serif;
+  font: 700 11px/1.2 Inter, system-ui, "Segoe UI", Arial, "Noto Sans", sans-serif;
 }
 
 .control-dock button {
@@ -191,7 +191,7 @@ body:has(.pause-mode) .control-dock {
   color: #071426;
   background: #dff7ff;
   border-radius: 4px;
-  font: 800 10px/1 Arial, sans-serif;
+  font: 800 10px/1 Inter, system-ui, "Segoe UI", Arial, "Noto Sans", sans-serif;
   text-align: center;
 }
 
@@ -213,7 +213,7 @@ body:has(.pause-mode) .control-dock {
 
 .mute-button {
   right: 18px;
-  bottom: 18px;
+  bottom: 194px;
   min-width: 104px;
   padding: 10px 12px;
   color: #dff7ff;

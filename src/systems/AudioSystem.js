@@ -1,3 +1,5 @@
+import { t } from "../data/i18n.js";
+
 export class AudioSystem {
   constructor(button) {
     this.button = button;
@@ -11,7 +13,10 @@ export class AudioSystem {
 
   bind() {
     if (!this.button) return;
-    this.button.addEventListener("pointerdown", (event) => event.stopPropagation());
+    this.button.addEventListener("pointerdown", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+    });
     this.button.addEventListener("click", (event) => {
       event.preventDefault();
       this.setMuted(!this.muted);
@@ -48,7 +53,7 @@ export class AudioSystem {
 
   updateButton() {
     if (!this.button) return;
-    this.button.textContent = this.muted ? "Sound Off" : "Sound On";
+    this.button.textContent = t(this.muted ? "common.soundOff" : "common.soundOn");
     this.button.setAttribute("aria-pressed", String(this.muted));
   }
 

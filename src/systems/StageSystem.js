@@ -34,7 +34,7 @@ export class StageSystem {
     this.game.state.set(STATES.STAGE_CLEAR);
     this.game.awardStageClearBonus(this.stageId);
     this.game.enemies.length = 0;
-    this.game.enemyBullets.length = 0;
+    this.game.clearEnemyBullets();
     this.game.effects.explode(this.game.width / 2, this.game.height * 0.35, true);
     this.game.openUpgrade();
   }

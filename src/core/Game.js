@@ -3,7 +3,10 @@ import { Renderer } from "./Renderer.js";
 import { StateManager, STATES } from "./StateManager.js";
 import { circleHit } from "./Collision.js";
 import { Player } from "../entities/Player.js";
+import { Enemy } from "../entities/Enemy.js";
+import { Bullet } from "../entities/Bullet.js";
 import { PowerUp } from "../entities/PowerUp.js";
+import { Particle } from "../entities/Particle.js";
 import { WEAPON_DROP_IDS } from "../data/weapons.js";
 import { BALANCE } from "../data/balance.js";
 import { SHIPS, getShip } from "../data/ships.js";
@@ -40,9 +43,9 @@ export class Game {
     this.stats = { enemiesDestroyed: 0, stageReached: 1, maxCombo: 1, endlessTime: 0, stageHits: 0, totalHits: 0, bossTime: 0, stageKills: 0, stageDamageTaken: 0, creditsEarned: 0 };
     this.combo = { count: 0, multiplier: 1, timer: 0, maxTimer: 3.2 };
     this.endless = { active: false, time: 0, multiplier: 1, survivalBonusTimer: 0 };
-    this.debug = { visible: false, fps: 60, frames: 0, elapsed: 0 };
+    this.debug = { visible: false, fps: 60, averageFps: 60, frames: 0, elapsed: 0 };
     this.performanceTier = "normal";
-    this.performanceSamples = { low: 0, critical: 0, recovery: 0 };
+    this.performanceSamples = { lowSeconds: 0, criticalSeconds: 0, recoverySeconds: 0 };
     this.stageResult = null;
     this.mobile = false;
     this.layout = {
@@ -88,25 +91,37 @@ export class Game {
     this.input.setViewportProvider(() => ({ width: this.width, height: this.height }));
     this.audio.bind();
     if (this.hud.elements.skillButton) {
-      this.hud.elements.skillButton.addEventListener("pointerdown", (event) => event.stopPropagation());
+      this.hud.elements.skillButton.addEventListener("pointerdown", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+      });
       this.hud.elements.skillButton.addEventListener("click", (event) => {
         event.preventDefault();
         this.input.requestSkill();
       });
     }
     if (this.hud.elements.pauseButton) {
-      this.hud.elements.pauseButton.addEventListener("pointerdown", (event) => event.stopPropagation());
+      this.hud.elements.pauseButton.addEventListener("pointerdown", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+      });
       this.hud.elements.pauseButton.addEventListener("click", (event) => {
         event.preventDefault();
         this.togglePause();
       });
     }
     if (this.hud.elements.dockPauseButton) {
-      this.hud.elements.dockPauseButton.addEventListener("pointerdown", (event) => event.stopPropagation());
+      this.hud.elements.dockPauseButton.addEventListener("pointerdown", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+      });
       this.hud.elements.dockPauseButton.addEventListener("click", () => this.togglePause());
     }
     if (this.hud.elements.languageButton) {
-      this.hud.elements.languageButton.addEventListener("pointerdown", (event) => event.stopPropagation());
+      this.hud.elements.languageButton.addEventListener("pointerdown", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+      });
       this.hud.elements.languageButton.addEventListener("click", () => {
         this.lang = toggleLanguage();
         this.refreshLanguage();
@@ -222,10 +237,10 @@ export class Game {
     this.endless = { active: false, time: 0, multiplier: 1, survivalBonusTimer: 0 };
     this.debug.frames = 0;
     this.debug.elapsed = 0;
-    this.playerBullets.length = 0;
-    this.enemyBullets.length = 0;
+    this.releaseAll(this.playerBullets, Bullet.release.bind(Bullet));
+    this.releaseAll(this.enemyBullets, Bullet.release.bind(Bullet));
     this.enemies.length = 0;
-    this.powerUps.length = 0;
+    this.releaseAll(this.powerUps, PowerUp.release.bind(PowerUp));
     this.boss = null;
     this.stageResult = null;
     this.player.reset(this.width, this.height, getShip(this.save.best.selectedShipId));
@@ -243,10 +258,10 @@ export class Game {
     this.endless.survivalBonusTimer = 0;
     this.stats.stageReached = Math.max(this.stats.stageReached, 6);
     this.boss = null;
-    this.playerBullets.length = 0;
-    this.enemyBullets.length = 0;
+    this.releaseAll(this.playerBullets, Bullet.release.bind(Bullet));
+    this.releaseAll(this.enemyBullets, Bullet.release.bind(Bullet));
     this.enemies.length = 0;
-    this.powerUps.length = 0;
+    this.releaseAll(this.powerUps, PowerUp.release.bind(PowerUp));
     this.spawnSystem.reset();
     this.state.set(STATES.ENDLESS);
     this.menu.hide();
@@ -303,23 +318,38 @@ export class Game {
   }
 
   updateEntities(dt) {
-    this.playerBullets = this.playerBullets.filter((bullet) => {
+    this.compactInPlace(this.playerBullets, (bullet) => {
       bullet.update(dt, this);
       return bullet.life > 0 && bullet.y > -80 && bullet.y < this.height + 80 && bullet.x > -80 && bullet.x < this.width + 80;
-    });
-    this.enemyBullets = this.enemyBullets.filter((bullet) => {
+    }, Bullet.release.bind(Bullet));
+    this.compactInPlace(this.enemyBullets, (bullet) => {
       bullet.update(dt, this);
-      return bullet.life > 0 && bullet.y < this.height + 80;
-    });
-    this.enemies = this.enemies.filter((enemy) => {
+      return bullet.life > 0 && bullet.y > -80 && bullet.y < this.height + 80 && bullet.x > -80 && bullet.x < this.width + 80;
+    }, Bullet.release.bind(Bullet));
+    this.compactInPlace(this.enemies, (enemy) => {
       enemy.update(dt, this);
       return enemy.y <= this.height + 80 && enemy.hp > 0;
     });
-    this.powerUps = this.powerUps.filter((powerUp) => {
+    this.compactInPlace(this.powerUps, (powerUp) => {
       powerUp.update(dt, this);
       return powerUp.life > 0 && powerUp.y < this.height + 50;
-    });
+    }, PowerUp.release.bind(PowerUp));
     this.enforceSoftCaps();
+  }
+
+  compactInPlace(items, keep, release = null) {
+    let write = 0;
+    for (let read = 0; read < items.length; read++) {
+      const item = items[read];
+      if (keep(item)) items[write++] = item;
+      else if (release) release(item);
+    }
+    items.length = write;
+  }
+
+  releaseAll(items, release) {
+    for (const item of items) release(item);
+    items.length = 0;
   }
 
   enforceSoftCaps() {
@@ -334,18 +364,21 @@ export class Game {
   trimOldest(items, cap) {
     if (items.length <= cap) return;
     const excess = items.length - cap;
-    items.splice(0, excess);
+    const removed = items.splice(0, excess);
+    if (items === this.playerBullets || items === this.enemyBullets) removed.forEach(Bullet.release.bind(Bullet));
+    else if (items === this.powerUps) removed.forEach(PowerUp.release.bind(PowerUp));
+    else if (items === this.effects.particles) removed.forEach(Particle.release.bind(Particle));
   }
 
   getPerformanceLimits() {
     const desktop = {
-      normal: { playerBullets: 160, enemyBullets: 220, particles: 200, powerUps: 16, enemies: 34 },
-      low: { playerBullets: 130, enemyBullets: 180, particles: 140, powerUps: 12, enemies: 28 },
-      critical: { playerBullets: 100, enemyBullets: 140, particles: 90, powerUps: 10, enemies: 22 }
+      normal: { playerBullets: 140, enemyBullets: 180, particles: 180, powerUps: 14, enemies: 32 },
+      low: { playerBullets: 100, enemyBullets: 130, particles: 110, powerUps: 10, enemies: 24 },
+      critical: { playerBullets: 70, enemyBullets: 90, particles: 60, powerUps: 8, enemies: 18 }
     };
     const limits = { ...desktop[this.performanceTier] };
     if (this.mobile) {
-      for (const key of Object.keys(limits)) limits[key] = Math.max(8, Math.floor(limits[key] * 0.8));
+      for (const key of Object.keys(limits)) limits[key] = Math.max(6, Math.floor(limits[key] * 0.75));
     }
     return limits;
   }
@@ -354,11 +387,39 @@ export class Game {
     return this.performanceTier === "critical" ? 0.18 : this.performanceTier === "low" ? 0.42 : 1;
   }
 
+  addPlayerBullet(config) {
+    if (this.playerBullets.length >= this.getPerformanceLimits().playerBullets) return false;
+    this.playerBullets.push(Bullet.acquire(config));
+    return true;
+  }
+
+  addEnemyBullet(config) {
+    if (this.enemyBullets.length >= this.getPerformanceLimits().enemyBullets) return false;
+    this.enemyBullets.push(Bullet.acquire(config));
+    return true;
+  }
+
+  clearEnemyBullets() {
+    this.releaseAll(this.enemyBullets, Bullet.release.bind(Bullet));
+  }
+
+  addPowerUp(x, y, type) {
+    if (this.powerUps.length >= this.getPerformanceLimits().powerUps) return false;
+    this.powerUps.push(PowerUp.acquire(x, y, type));
+    return true;
+  }
+
+  addEnemy(type, x, y, stageId = 1, options = {}) {
+    if (this.enemies.length >= this.getPerformanceLimits().enemies) return false;
+    this.enemies.push(new Enemy(type, x, y, stageId, options));
+    return true;
+  }
+
   checkCollisions() {
     for (let i = this.playerBullets.length - 1; i >= 0; i--) {
       const bullet = this.playerBullets[i];
       if (this.boss && circleHit(bullet, this.boss, bullet.r, this.boss.r * 0.9)) {
-        this.playerBullets.splice(i, 1);
+        Bullet.release(this.playerBullets.splice(i, 1)[0]);
         if (this.boss.takeDamage(bullet.damage)) this.defeatBoss();
         continue;
       }
@@ -367,7 +428,7 @@ export class Game {
         const enemy = this.enemies[j];
         if (!circleHit(bullet, enemy)) continue;
         if (bullet.pierce > 0) bullet.pierce -= 1;
-        else this.playerBullets.splice(i, 1);
+        else Bullet.release(this.playerBullets.splice(i, 1)[0]);
         this.effects.burst(bullet.x, bullet.y, bullet.color || "#ffe66d", 6, 90, 0.25);
         const killed = enemy.takeDamage(this.damageAfterEnemyAura(enemy, bullet.damage));
         if (bullet.splash > 0) this.splashDamage(bullet, enemy);
@@ -380,7 +441,7 @@ export class Game {
       const bullet = this.enemyBullets[i];
       this.checkGraze(bullet);
       if (!circleHit(bullet, this.player)) continue;
-      this.enemyBullets.splice(i, 1);
+      Bullet.release(this.enemyBullets.splice(i, 1)[0]);
       this.player.takeDamage(bullet.damage, this);
     }
 
@@ -398,6 +459,7 @@ export class Game {
       if (!circleHit(powerUp, this.player)) continue;
       this.powerUps.splice(i, 1);
       this.applyPowerUp(powerUp);
+      PowerUp.release(powerUp);
       this.addScore(15);
       this.effects.burst(this.player.x, this.player.y, "#7fffd0", 20, 200, 0.55);
     }
@@ -455,7 +517,8 @@ export class Game {
       if (enemy.takeDamage(damage)) this.killEnemy(i, enemy);
       else this.effects.burst(enemy.x, enemy.y, "#ff8a5c", 7, 120, 0.28);
     }
-    this.enemyBullets.splice(0, Math.ceil(this.enemyBullets.length * 0.72));
+    const removed = this.enemyBullets.splice(0, Math.ceil(this.enemyBullets.length * 0.72));
+    removed.forEach(Bullet.release.bind(Bullet));
     this.effects.explode(px, py - 40, false);
     this.shake = Math.min(this.mobile ? 10 : 16, this.shake + (this.mobile ? 6 : 10));
   }
@@ -469,7 +532,7 @@ export class Game {
     this.addScore(enemy.config.score * (enemy.scoreScale || 1), true);
     this.player.energy = Math.min(BALANCE.thunder.maxEnergy, this.player.energy + this.energyGain(enemy.config.miniBoss ? 18 : BALANCE.thunder.chargePerKill));
     if (Math.random() < this.dropChance(enemy)) {
-      this.powerUps.push(new PowerUp(enemy.x, enemy.y, this.rollPowerUpType(enemy)));
+      this.addPowerUp(enemy.x, enemy.y, this.rollPowerUpType(enemy));
     }
     this.effects.explode(enemy.x, enemy.y, enemy.type === "tank");
     this.audio.play("explosion");
@@ -642,15 +705,18 @@ export class Game {
     this.debug.frames += 1;
     this.debug.elapsed += dt;
     if (this.debug.elapsed >= 1.2) {
-      this.debug.fps = Math.round(this.debug.frames / this.debug.elapsed);
+      const sampleSeconds = this.debug.elapsed;
+      this.debug.fps = Math.round(this.debug.frames / sampleSeconds);
+      this.debug.averageFps = Math.round(this.debug.averageFps * 0.72 + this.debug.fps * 0.28);
       this.debug.frames = 0;
       this.debug.elapsed = 0;
-      this.updatePerformanceTier();
+      this.updatePerformanceTier(sampleSeconds);
     }
     const overlay = this.hud.elements.debugOverlay;
     if (!overlay || !this.debug.visible) return;
     overlay.textContent = [
       `FPS ${this.debug.fps}`,
+      `Avg FPS ${this.debug.averageFps}`,
       `Tier ${this.performanceTier}`,
       `DPR ${this.dpr.toFixed(2)}`,
       `State ${this.state.state}`,
@@ -663,18 +729,20 @@ export class Game {
     ].join("\n");
   }
 
-  updatePerformanceTier() {
-    const fps = this.debug.fps;
-    this.performanceSamples.critical = fps < 35 ? this.performanceSamples.critical + 1 : 0;
-    this.performanceSamples.low = fps < 45 ? this.performanceSamples.low + 1 : 0;
-    this.performanceSamples.recovery = fps >= 55 ? this.performanceSamples.recovery + 1 : 0;
+  updatePerformanceTier(sampleSeconds) {
+    const fps = this.debug.averageFps;
+    this.performanceSamples.criticalSeconds = fps < 32 ? this.performanceSamples.criticalSeconds + sampleSeconds : 0;
+    this.performanceSamples.lowSeconds = fps < 45 ? this.performanceSamples.lowSeconds + sampleSeconds : 0;
+    this.performanceSamples.recoverySeconds = fps >= 56 ? this.performanceSamples.recoverySeconds + sampleSeconds : 0;
     let next = this.performanceTier;
-    if (this.performanceSamples.critical >= 2) next = "critical";
-    else if (this.performanceSamples.low >= 3 && this.performanceTier === "normal") next = "low";
-    else if (this.performanceSamples.recovery >= 3) next = this.performanceTier === "critical" ? "low" : "normal";
+    if (this.performanceSamples.criticalSeconds >= 1.5) next = "critical";
+    else if (this.performanceSamples.lowSeconds >= 2 && this.performanceTier === "normal") next = "low";
+    else if (this.performanceSamples.recoverySeconds >= 5) next = this.performanceTier === "critical" ? "low" : "normal";
     if (next !== this.performanceTier) {
       this.performanceTier = next;
       this.effects.maxParticles = this.getPerformanceLimits().particles;
+      this.enforceSoftCaps();
+      this.performanceSamples = { lowSeconds: 0, criticalSeconds: 0, recoverySeconds: 0 };
       this.resizeSoon();
     }
   }
@@ -688,17 +756,18 @@ export class Game {
     if (this.hud.elements.languageButton) this.hud.elements.languageButton.textContent = this.lang === "vi" ? "VI | EN" : "EN | VI";
     if (this.hud.elements.orientationHint) this.hud.elements.orientationHint.textContent = t("orientation");
     for (const label of document.querySelectorAll("[data-i18n]")) label.textContent = t(label.dataset.i18n);
+    this.audio.updateButton();
     this.hud.update(this);
   }
 
   activateThunder() {
     const player = this.player;
     if (player.thunderCooldown > 0) {
-      this.effects.message(`Cooldown: ${Math.ceil(player.thunderCooldown)}s`);
+      this.effects.message(t("thunder.cooldown", { seconds: Math.ceil(player.thunderCooldown) }));
       return false;
     }
     if (player.energy < BALANCE.thunder.cost) {
-      this.effects.message("Thunder Not Ready");
+      this.effects.message(t("thunder.noEnergy"));
       return false;
     }
     const radius = BALANCE.thunder.radius + player.stats.thunderRadius;
@@ -709,7 +778,7 @@ export class Game {
     player.energy = 0;
     player.thunderCooldown = player.stats.thunderCooldown;
     this.shake = Math.min(this.mobile ? 13 : 30, this.shake + (this.mobile ? 10 : 24));
-    this.enemyBullets.length = 0;
+    this.clearEnemyBullets();
 
     for (let i = targets.length - 1; i >= 0; i--) {
       const enemy = targets[i];

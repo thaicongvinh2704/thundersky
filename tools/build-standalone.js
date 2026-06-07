@@ -76,17 +76,17 @@ ${styles}
 
   <div class="hud">
     <div class="panel">
-      <div class="label" data-i18n="hud.score">Diem</div>
+      <div class="label" data-i18n="hud.score">Điểm</div>
       <div class="value" id="score">0</div>
-      <div class="mini-stat">Best <span id="bestScore">0</span></div>
-      <div class="mini-stat">Kills <span id="destroyedCount">0</span></div>
-      <div class="mini-stat">Combo <span id="comboText">x1.00</span></div>
+      <div class="mini-stat"><span data-i18n="hud.best">Kỷ lục</span> <span id="bestScore">0</span></div>
+      <div class="mini-stat"><span data-i18n="hud.kills">Địch hạ</span> <span id="destroyedCount">0</span></div>
+      <div class="mini-stat"><span data-i18n="hud.combo">Combo</span> <span id="comboText">x1.00</span></div>
       <div class="combo-bar"><div class="combo-fill" id="comboFill"></div></div>
-      <div class="mini-stat" id="endlessText">Best Endless 0s</div>
+      <div class="mini-stat" id="endlessText">Vô tận tốt nhất 0s</div>
     </div>
 
     <div class="panel status-panel">
-      <div class="label" data-i18n="hud.health">Mau</div>
+      <div class="label" data-i18n="hud.health">Máu</div>
       <div class="bar"><div class="fill" id="health"></div></div>
       <div class="label" id="energyText">Thunder 0%</div>
       <div class="bar energy-bar"><div class="energy-fill" id="energy"></div></div>
@@ -96,14 +96,14 @@ ${styles}
     </div>
 
     <div class="panel upgrades-panel">
-      <div class="label" data-i18n="hud.upgrades">Nang cap</div>
-      <div id="upgradeList" class="upgrade-list">Chua co</div>
+      <div class="label" data-i18n="hud.upgrades">Nâng cấp</div>
+      <div id="upgradeList" class="upgrade-list">Chưa có</div>
     </div>
   </div>
 
   <button class="mute-button" id="muteBtn" type="button">Sound On</button>
   <button class="skill-button" id="skillBtn" type="button">Thunder</button>
-  <button class="pause-button" id="pauseBtn" type="button" aria-label="Pause">Pause</button>
+  <button class="pause-button" id="pauseBtn" type="button" aria-label="Pause" data-i18n="controls.pause">Tạm dừng</button>
   <div class="control-dock" id="controlDock">
     <button id="dockPauseBtn" type="button"><kbd>ESC / P</kbd><span data-i18n="controls.pause">Pause</span></button>
     <div><kbd>RMB / Q / E</kbd><span data-i18n="controls.thunder">Thunder</span></div>
@@ -121,14 +121,14 @@ ${styles}
   <div class="center" id="overlay">
     <div class="menu">
       <h1 id="menuTitle">Sky Thunder</h1>
-      <p class="subtitle" id="menuText">Lai chien co xuyen qua bao may, song sot qua 5 stage va ha boss cuoi.</p>
+      <p class="subtitle" id="menuText">Lái chiến cơ xuyên qua bão mây, sống sót qua 5 chặng và hạ trùm cuối.</p>
       <div class="controls" id="menuControls">
-        WASD / mui ten hoac keo chuot de di chuyen<br />
-        Auto-fire bat san. Nhan E hoac nut Thunder khi day 100% energy<br />
-        P de tam dung. Ha dich va nhat item E de nap Thunder
+        WASD / phím mũi tên hoặc kéo chuột để di chuyển<br />
+        Tự động bắn. Nhấn E hoặc nút Bão Sấm khi đủ 100% năng lượng<br />
+        ESC / P để tạm dừng
       </div>
       <div class="upgrade-options hidden" id="upgradeOptions"></div>
-      <button id="startBtn">Bat dau</button>
+      <button id="startBtn">Bắt đầu</button>
       <button id="secondaryBtn" class="secondary hidden">Restart</button>
     </div>
   </div>
@@ -140,6 +140,6 @@ ${scripts}
 </html>
 `;
 
-fs.writeFileSync(path.join(root, "index.html"), html);
-fs.writeFileSync(path.join(root, "Sky-Thunder-Play.html"), html);
+fs.writeFileSync(path.join(root, "index.html"), html, "utf8");
+fs.writeFileSync(path.join(root, "Sky-Thunder-Play.html"), html, "utf8");
 console.log("Built standalone files: sky-thunder/index.html and sky-thunder/Sky-Thunder-Play.html");

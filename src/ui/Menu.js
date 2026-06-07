@@ -24,6 +24,10 @@ export class Menu {
     button.type = "button";
     button.textContent = text;
     button.className = tone ? `pause-action ${tone}` : "pause-action";
+    button.addEventListener("pointerdown", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+    });
     return button;
   }
 
@@ -59,6 +63,11 @@ export class Menu {
     this.startHandler = this.defaultStartHandler;
     this.show("Sky Thunder", t("menu.intro"), t("menu.start"), true);
     this.hangarButton.textContent = t("menu.hangar");
+    this.elements.controls.innerHTML = [
+      `${t("controls.moveFire")}: ${t("controls.leftMouse")} / WASD / Arrow Keys`,
+      `${t("controls.thunder")}: ${t("controls.rightKeys")}`,
+      `${t("controls.pause")}: ${t("controls.pauseKeys")}`
+    ].join("<br>");
   }
 
   show(title, text, buttonText, showControls = false, secondaryText = "") {

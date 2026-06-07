@@ -15,6 +15,7 @@ export class EffectsSystem {
   }
 
   reset() {
+    for (const particle of this.particles) Particle.release(particle);
     this.particles.length = 0;
     this.clouds.length = 0;
     this.lightnings.length = 0;
@@ -41,8 +42,8 @@ export class EffectsSystem {
     const particleCount = Math.max(1, Math.ceil((this.game.mobile ? count * 0.64 : count) * this.game.getEffectScale()));
     const particleSpeed = this.game.mobile ? speed * 0.86 : speed;
     for (let i = 0; i < particleCount; i++) {
-      if (this.particles.length >= this.maxParticles) this.particles.shift();
-      this.particles.push(new Particle(x, y, color, particleSpeed, life));
+      if (this.particles.length >= this.maxParticles) Particle.release(this.particles.shift());
+      this.particles.push(Particle.acquire(x, y, color, particleSpeed, life));
     }
   }
 
@@ -120,29 +121,35 @@ export class EffectsSystem {
       }
     }
 
-    this.clouds = this.clouds.filter((cloud) => {
+    this.compact(this.clouds, (cloud) => {
       cloud.y += cloud.vy * dt;
       return cloud.y <= this.game.height + 130;
     });
-
-    this.particles = this.particles.filter((particle) => {
+    this.compact(this.particles, (particle) => {
       particle.update(dt);
       return particle.life > 0;
-    });
-
-    this.lightnings = this.lightnings.filter((bolt) => {
+    }, Particle.release.bind(Particle));
+    this.compact(this.lightnings, (bolt) => {
       bolt.life -= dt;
       return bolt.life > 0;
     });
-
-    this.messages = this.messages.filter((message) => {
+    this.compact(this.messages, (message) => {
       message.life -= dt;
       return message.life > 0;
     });
-
-    this.indicators = this.indicators.filter((indicator) => {
+    this.compact(this.indicators, (indicator) => {
       indicator.life -= dt;
       return indicator.life > 0;
     });
+  }
+
+  compact(items, keep, release = null) {
+    let write = 0;
+    for (let read = 0; read < items.length; read++) {
+      const item = items[read];
+      if (keep(item)) items[write++] = item;
+      else if (release) release(item);
+    }
+    items.length = write;
   }
 }

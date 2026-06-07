@@ -22,7 +22,7 @@ body {
   overscroll-behavior: none;
   overscroll-behavior-x: none;
   overscroll-behavior-y: none;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, "Noto Sans", sans-serif;
   background: #061221;
   color: #f6fbff;
   touch-action: none;
@@ -263,7 +263,7 @@ body:has(.pause-mode) .control-dock {
   border: 0;
   box-shadow: none;
   text-align: left;
-  font: 700 11px/1.2 Arial, sans-serif;
+  font: 700 11px/1.2 Inter, system-ui, "Segoe UI", Arial, "Noto Sans", sans-serif;
 }
 
 .control-dock button {
@@ -275,7 +275,7 @@ body:has(.pause-mode) .control-dock {
   color: #071426;
   background: #dff7ff;
   border-radius: 4px;
-  font: 800 10px/1 Arial, sans-serif;
+  font: 800 10px/1 Inter, system-ui, "Segoe UI", Arial, "Noto Sans", sans-serif;
   text-align: center;
 }
 
@@ -297,7 +297,7 @@ body:has(.pause-mode) .control-dock {
 
 .mute-button {
   right: 18px;
-  bottom: 18px;
+  bottom: 194px;
   min-width: 104px;
   padding: 10px 12px;
   color: #dff7ff;
@@ -946,17 +946,17 @@ h1 {
 
   <div class="hud">
     <div class="panel">
-      <div class="label" data-i18n="hud.score">Diem</div>
+      <div class="label" data-i18n="hud.score">Điểm</div>
       <div class="value" id="score">0</div>
-      <div class="mini-stat">Best <span id="bestScore">0</span></div>
-      <div class="mini-stat">Kills <span id="destroyedCount">0</span></div>
-      <div class="mini-stat">Combo <span id="comboText">x1.00</span></div>
+      <div class="mini-stat"><span data-i18n="hud.best">Kỷ lục</span> <span id="bestScore">0</span></div>
+      <div class="mini-stat"><span data-i18n="hud.kills">Địch hạ</span> <span id="destroyedCount">0</span></div>
+      <div class="mini-stat"><span data-i18n="hud.combo">Combo</span> <span id="comboText">x1.00</span></div>
       <div class="combo-bar"><div class="combo-fill" id="comboFill"></div></div>
-      <div class="mini-stat" id="endlessText">Best Endless 0s</div>
+      <div class="mini-stat" id="endlessText">Vô tận tốt nhất 0s</div>
     </div>
 
     <div class="panel status-panel">
-      <div class="label" data-i18n="hud.health">Mau</div>
+      <div class="label" data-i18n="hud.health">Máu</div>
       <div class="bar"><div class="fill" id="health"></div></div>
       <div class="label" id="energyText">Thunder 0%</div>
       <div class="bar energy-bar"><div class="energy-fill" id="energy"></div></div>
@@ -966,14 +966,14 @@ h1 {
     </div>
 
     <div class="panel upgrades-panel">
-      <div class="label" data-i18n="hud.upgrades">Nang cap</div>
-      <div id="upgradeList" class="upgrade-list">Chua co</div>
+      <div class="label" data-i18n="hud.upgrades">Nâng cấp</div>
+      <div id="upgradeList" class="upgrade-list">Chưa có</div>
     </div>
   </div>
 
   <button class="mute-button" id="muteBtn" type="button">Sound On</button>
   <button class="skill-button" id="skillBtn" type="button">Thunder</button>
-  <button class="pause-button" id="pauseBtn" type="button" aria-label="Pause">Pause</button>
+  <button class="pause-button" id="pauseBtn" type="button" aria-label="Pause" data-i18n="controls.pause">Tạm dừng</button>
   <div class="control-dock" id="controlDock">
     <button id="dockPauseBtn" type="button"><kbd>ESC / P</kbd><span data-i18n="controls.pause">Pause</span></button>
     <div><kbd>RMB / Q / E</kbd><span data-i18n="controls.thunder">Thunder</span></div>
@@ -991,14 +991,14 @@ h1 {
   <div class="center" id="overlay">
     <div class="menu">
       <h1 id="menuTitle">Sky Thunder</h1>
-      <p class="subtitle" id="menuText">Lai chien co xuyen qua bao may, song sot qua 5 stage va ha boss cuoi.</p>
+      <p class="subtitle" id="menuText">Lái chiến cơ xuyên qua bão mây, sống sót qua 5 chặng và hạ trùm cuối.</p>
       <div class="controls" id="menuControls">
-        WASD / mui ten hoac keo chuot de di chuyen<br />
-        Auto-fire bat san. Nhan E hoac nut Thunder khi day 100% energy<br />
-        P de tam dung. Ha dich va nhat item E de nap Thunder
+        WASD / phím mũi tên hoặc kéo chuột để di chuyển<br />
+        Tự động bắn. Nhấn E hoặc nút Bão Sấm khi đủ 100% năng lượng<br />
+        ESC / P để tạm dừng
       </div>
       <div class="upgrade-options hidden" id="upgradeOptions"></div>
-      <button id="startBtn">Bat dau</button>
+      <button id="startBtn">Bắt đầu</button>
       <button id="secondaryBtn" class="secondary hidden">Restart</button>
     </div>
   </div>
@@ -1059,29 +1059,29 @@ const BALANCE = {
 // src/data/i18n.js
 const LANGUAGES = {
   vi: {
-    "menu.start": "Bat dau", "menu.hangar": "Nha chua", "menu.intro": "Song sot qua cac dot tan cong, nap nang luong va kich hoat Bao Sam.",
-    "common.back": "Quay lai", "common.restart": "Choi lai", "common.mainMenu": "Menu chinh", "common.soundOn": "Am thanh: Bat", "common.soundOff": "Am thanh: Tat",
-    "language.label": "Ngon ngu: Tieng Viet", "pause.title": "Tam dung", "pause.resume": "Tiep tuc", "pause.help": "Chon thao tac hoac xem lai dieu khien.",
-    "controls.controls": "Dieu khien", "controls.moveFire": "Di chuyen + Ban", "controls.leftMouse": "Chuot trai", "controls.thunder": "Bao Sam", "controls.rightKeys": "Chuot phai / Q / E", "controls.pause": "Tam dung", "controls.pauseKeys": "ESC / P",
-    "hud.score": "Diem", "hud.health": "Mau", "hud.upgrades": "Nang cap", "hud.stage": "Chang", "hud.boss": "Trum", "hud.ship": "Tau", "hud.gun": "Sung", "hud.none": "Chua co",
-    "thunder.ready": "Bao Sam san sang", "thunder.cooldown": "Hoi chieu {seconds}s", "thunder.notReady": "Bao Sam {percent}%",
-    "game.over": "Het tran", "game.overLine": "Phi doi dich van con tren bau troi.", "game.victory": "Chien thang", "game.victoryLine": "Ban da ha trum cuoi. Tiep tuc vo tan de san diem cao hon.",
-    "game.playAgain": "Choi lai", "game.continueEndless": "Tiep tuc vo tan", "game.summary": "Diem: {score}. Ky luc: {best}. Chang: {stage}. Dich ha: {kills}. Combo cao nhat: x{combo}.",
-    "upgrade.stageClear": "Hoan thanh chang", "upgrade.choose": "Chon 1 nang cap de tiep tuc.", "hangar.title": "Nha chua", "hangar.choose": "Chon chien co", "hangar.credits": "Tin dung", "hangar.selected": "Da chon", "hangar.unlocked": "Da mo",
-    "power.repair": "SUA CHUA +18", "power.shield": "KHIEN +1", "power.bomb": "BOM XUNG KICH", "power.rapid": "BAN NHANH", "power.magnet": "NAM CHAM", "power.levelUp": "{weapon} LEN CAP!", "power.switch": "DOI SANG {weapon}",
-    "orientation": "Xoay doc man hinh de choi tot nhat"
+    "menu.start": "Bắt đầu", "menu.hangar": "Kho tàu", "menu.intro": "Sống sót qua các đợt tấn công, nạp năng lượng và kích hoạt Bão Sấm.",
+    "common.back": "Quay lại", "common.restart": "Chơi lại", "common.mainMenu": "Menu chính", "common.soundOn": "Âm thanh: Bật", "common.soundOff": "Âm thanh: Tắt",
+    "language.label": "Ngôn ngữ: Tiếng Việt", "pause.title": "Tạm dừng", "pause.resume": "Tiếp tục", "pause.help": "Chọn thao tác hoặc xem lại hướng dẫn điều khiển.",
+    "controls.controls": "Hướng dẫn", "controls.moveFire": "Di chuyển + Bắn", "controls.leftMouse": "Chuột trái", "controls.thunder": "Bão Sấm", "controls.rightKeys": "Chuột phải / Q / E", "controls.pause": "Tạm dừng", "controls.pauseKeys": "ESC / P",
+    "hud.score": "Điểm", "hud.best": "Kỷ lục", "hud.kills": "Địch hạ", "hud.combo": "Combo", "hud.endless": "Vô tận", "hud.bestEndless": "Vô tận tốt nhất", "hud.health": "Máu", "hud.upgrades": "Nâng cấp", "hud.stage": "Chặng", "hud.boss": "Trùm", "hud.ship": "Tàu chiến", "hud.gun": "Vũ khí", "hud.none": "Chưa có",
+    "thunder.ready": "Bão Sấm sẵn sàng", "thunder.cooldown": "Đang hồi chiêu {seconds}s", "thunder.notReady": "Bão Sấm {percent}%",
+    "thunder.noEnergy": "Không đủ năng lượng", "game.over": "Hết trận", "game.overLine": "Phi đội địch vẫn còn trên bầu trời.", "game.victory": "Chiến thắng", "game.victoryLine": "Bạn đã hạ trùm cuối. Tiếp tục vô tận để săn điểm cao hơn.",
+    "game.playAgain": "Chơi lại", "game.continueEndless": "Tiếp tục vô tận", "game.summary": "Điểm: {score}. Kỷ lục: {best}. Chặng: {stage}. Địch hạ: {kills}. Combo cao nhất: x{combo}.",
+    "upgrade.stageClear": "Hoàn thành chặng", "upgrade.choose": "Chọn 1 nâng cấp để tiếp tục.", "hangar.title": "Kho tàu", "hangar.choose": "Chọn tàu chiến", "hangar.credits": "Tín dụng", "hangar.selected": "Đã chọn", "hangar.unlocked": "Đã mở khóa",
+    "power.repair": "HỒI MÁU +18", "power.shield": "KHIÊN +1", "power.bomb": "BOM XUNG KÍCH", "power.rapid": "BẮN NHANH", "power.magnet": "NAM CHÂM", "power.levelUp": "{weapon} LÊN CẤP!", "power.switch": "ĐỔI SANG {weapon}", "power.rapidTimer": "Bắn nhanh", "power.magnetTimer": "Nam châm",
+    "orientation": "Xoay dọc màn hình để chơi tốt nhất"
   },
   en: {
     "menu.start": "Start", "menu.hangar": "Hangar", "menu.intro": "Survive enemy waves, charge energy, and unleash Thunder Storm.",
     "common.back": "Back", "common.restart": "Restart", "common.mainMenu": "Main Menu", "common.soundOn": "Sound On", "common.soundOff": "Sound Off",
     "language.label": "Language: English", "pause.title": "Paused", "pause.resume": "Resume", "pause.help": "Choose an action or review the controls.",
     "controls.controls": "Controls", "controls.moveFire": "Move + Fire", "controls.leftMouse": "Left Mouse", "controls.thunder": "Thunder", "controls.rightKeys": "Right Click / Q / E", "controls.pause": "Pause", "controls.pauseKeys": "ESC / P",
-    "hud.score": "Score", "hud.health": "HP", "hud.upgrades": "Upgrades", "hud.stage": "Stage", "hud.boss": "Boss", "hud.ship": "Ship", "hud.gun": "Gun", "hud.none": "None",
-    "thunder.ready": "Thunder Ready", "thunder.cooldown": "Cooldown {seconds}s", "thunder.notReady": "Thunder {percent}%",
+    "hud.score": "Score", "hud.best": "Best", "hud.kills": "Kills", "hud.combo": "Combo", "hud.endless": "Endless", "hud.bestEndless": "Best Endless", "hud.health": "HP", "hud.upgrades": "Upgrades", "hud.stage": "Stage", "hud.boss": "Boss", "hud.ship": "Ship", "hud.gun": "Gun", "hud.none": "None",
+    "thunder.ready": "Thunder Ready", "thunder.cooldown": "Cooldown {seconds}s", "thunder.notReady": "Thunder {percent}%", "thunder.noEnergy": "Not enough energy",
     "game.over": "Game Over", "game.overLine": "The enemy fleet still controls the sky.", "game.victory": "Victory", "game.victoryLine": "The final boss is down. Continue Endless for a higher score.",
     "game.playAgain": "Play Again", "game.continueEndless": "Continue Endless", "game.summary": "Score: {score}. Best: {best}. Stage: {stage}. Enemies: {kills}. Max combo: x{combo}.",
     "upgrade.stageClear": "Stage Clear", "upgrade.choose": "Choose one upgrade to continue.", "hangar.title": "Hangar", "hangar.choose": "Choose your fighter", "hangar.credits": "Credits", "hangar.selected": "Selected", "hangar.unlocked": "Unlocked",
-    "power.repair": "REPAIR +18", "power.shield": "SHIELD +1", "power.bomb": "BOMB BLAST", "power.rapid": "RAPID FIRE", "power.magnet": "MAGNET ON", "power.levelUp": "{weapon} LEVEL UP!", "power.switch": "SWITCHED TO {weapon}",
+    "power.repair": "REPAIR +18", "power.shield": "SHIELD +1", "power.bomb": "BOMB BLAST", "power.rapid": "RAPID FIRE", "power.magnet": "MAGNET ON", "power.levelUp": "{weapon} LEVEL UP!", "power.switch": "SWITCHED TO {weapon}", "power.rapidTimer": "Rapid", "power.magnetTimer": "Magnet",
     "orientation": "Rotate to portrait for best experience"
   }
 };
@@ -1651,7 +1651,11 @@ class Input {
   constructor(canvas) {
     this.canvas = canvas;
     this.keys = new Set();
-    this.pointer = { x: 0, y: 0, active: false, fire: false, id: null };
+    this.pointer = {
+      x: 0, y: 0, active: false, fire: false, id: null,
+      pointerActive: false, pointerDown: false, dragging: false,
+      lastPointerX: 0, lastPointerY: 0, lastKnownInsideViewport: true
+    };
     this.mobile = false;
     this.skillRequested = false;
     this.autoFire = true;
@@ -1685,6 +1689,9 @@ class Input {
     window.addEventListener("pointermove", (event) => {
       if (this.pointer.active && this.pointer.id === event.pointerId) this.setPointer(event, false);
     }, { passive: false });
+    window.addEventListener("mousemove", (event) => {
+      if (!this.mobile && this.pointer.dragging) this.setMousePointer(event);
+    }, { passive: false });
     this.canvas.addEventListener("pointerdown", (event) => {
       if (event.button === 2 && !this.mobile) {
         event.preventDefault();
@@ -1708,7 +1715,10 @@ class Input {
     }, { passive: false });
     window.addEventListener("pointercancel", (event) => {
       this.releasePointer(event);
-      if (this.pointer.id === event.pointerId) this.resetPointer();
+      if (this.pointer.id === event.pointerId) this.preserveLastTarget();
+    }, { passive: false });
+    window.addEventListener("mouseup", (event) => {
+      if (event.button === 0) this.resetPointer();
     }, { passive: false });
     window.addEventListener("touchmove", (event) => {
       if (!event.target.closest?.(".menu")) event.preventDefault();
@@ -1718,12 +1728,12 @@ class Input {
       if (this.pointer.active || event.target === this.canvas) event.preventDefault();
     });
     window.addEventListener("blur", () => {
-      this.pointer.fire = false;
+      this.preserveLastTarget();
       this.pointer.id = null;
       this.justActivated = false;
     });
     document.addEventListener("visibilitychange", () => {
-      if (document.hidden) this.resetPointer();
+      if (document.hidden) this.preserveLastTarget();
     });
   }
 
@@ -1740,18 +1750,53 @@ class Input {
     event.preventDefault();
     if (this.pointer.id !== null && this.pointer.id !== event.pointerId) return;
     this.pointer.active = true;
+    this.pointer.pointerActive = true;
     this.pointer.id = event.pointerId;
     this.pointer.fire = fire || this.pointer.fire;
-    const viewport = this.viewport();
-    this.pointer.x = Math.max(0, Math.min(viewport.width, event.clientX));
-    this.pointer.y = Math.max(0, Math.min(viewport.height, event.clientY));
+    this.pointer.pointerDown = fire || this.pointer.pointerDown;
+    this.pointer.dragging = fire || this.pointer.dragging;
+    this.updateClampedPosition(event.clientX, event.clientY);
     if (fire) this.justActivated = true;
+  }
+
+  setMousePointer(event) {
+    event.preventDefault();
+    if (!this.pointer.dragging) return;
+    if (event.buttons === 0 && document.hasFocus()) {
+      this.resetPointer();
+      return;
+    }
+    this.pointer.active = true;
+    this.pointer.pointerActive = true;
+    this.pointer.fire = true;
+    this.pointer.pointerDown = true;
+    this.updateClampedPosition(event.clientX, event.clientY);
+  }
+
+  updateClampedPosition(clientX, clientY) {
+    const viewport = this.viewport();
+    this.pointer.lastKnownInsideViewport = clientX >= 0 && clientX <= viewport.width && clientY >= 0 && clientY <= viewport.height;
+    this.pointer.x = Math.max(0, Math.min(viewport.width, clientX));
+    this.pointer.y = Math.max(0, Math.min(viewport.height, clientY));
+    this.pointer.lastPointerX = this.pointer.x;
+    this.pointer.lastPointerY = this.pointer.y;
+  }
+
+  preserveLastTarget() {
+    if (!this.pointer.dragging) return;
+    this.pointer.active = true;
+    this.pointer.pointerActive = true;
+    this.pointer.x = this.pointer.lastPointerX;
+    this.pointer.y = this.pointer.lastPointerY;
   }
 
   resetPointer() {
     this.pointer.active = false;
+    this.pointer.pointerActive = false;
     this.pointer.fire = false;
     this.pointer.id = null;
+    this.pointer.pointerDown = false;
+    this.pointer.dragging = false;
     this.justActivated = false;
   }
 
@@ -1829,15 +1874,15 @@ class Renderer {
     }
 
     this.drawBackground(time);
-    for (const bullet of game.playerBullets) bullet.draw(ctx);
+    for (const bullet of game.playerBullets) bullet.draw(ctx, game);
     for (const powerUp of game.powerUps) powerUp.draw(ctx, game);
-    for (const enemy of game.enemies) enemy.draw(ctx);
-    if (game.boss) game.boss.draw(ctx, game.height);
-    for (const bullet of game.enemyBullets) bullet.draw(ctx);
-    game.player.draw(ctx);
+    for (const enemy of game.enemies) enemy.draw(ctx, game);
+    if (game.boss) game.boss.draw(ctx, game.height, game);
+    for (const bullet of game.enemyBullets) bullet.draw(ctx, game);
+    game.player.draw(ctx, game);
     this.drawLightnings();
     this.drawIndicators();
-    for (const particle of game.effects.particles) particle.draw(ctx);
+    for (const particle of game.effects.particles) particle.draw(ctx, game);
     this.drawMessages();
     ctx.restore();
   }
@@ -1862,21 +1907,25 @@ class Renderer {
     }
     ctx.restore();
 
-    for (const cloud of game.effects.clouds) this.drawCloud(cloud);
-
-    ctx.save();
-    ctx.globalAlpha = 0.22;
-    ctx.strokeStyle = "#76d8ff";
-    ctx.lineWidth = 1;
-    const streaks = Math.max(2, Math.ceil((game.mobile ? 5 : 9) * game.getEffectScale()));
-    for (let i = 0; i < streaks; i++) {
-      const x = ((time * 0.035 + i * 170) % (game.width + 220)) - 110;
-      ctx.beginPath();
-      ctx.moveTo(x, game.height * 0.08);
-      ctx.quadraticCurveTo(x + 60, game.height * 0.38, x - 20, game.height + 40);
-      ctx.stroke();
+    if (game.performanceTier !== "critical") {
+      for (const cloud of game.effects.clouds) this.drawCloud(cloud);
     }
-    ctx.restore();
+
+    if (game.performanceTier !== "critical") {
+      ctx.save();
+      ctx.globalAlpha = game.performanceTier === "low" ? 0.1 : 0.22;
+      ctx.strokeStyle = "#76d8ff";
+      ctx.lineWidth = 1;
+      const streaks = Math.max(2, Math.ceil((game.mobile ? 5 : 9) * game.getEffectScale()));
+      for (let i = 0; i < streaks; i++) {
+        const x = ((time * 0.035 + i * 170) % (game.width + 220)) - 110;
+        ctx.beginPath();
+        ctx.moveTo(x, game.height * 0.08);
+        ctx.quadraticCurveTo(x + 60, game.height * 0.38, x - 20, game.height + 40);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
   }
 
   drawCloud(cloud) {
@@ -1925,7 +1974,7 @@ class Renderer {
     const { ctx, game } = this;
     ctx.save();
     ctx.textAlign = "center";
-    ctx.font = game.mobile ? "800 18px Arial, sans-serif" : "800 24px Arial, sans-serif";
+    ctx.font = game.mobile ? '800 18px Inter, system-ui, "Segoe UI", Arial, "Noto Sans", sans-serif' : '800 24px Inter, system-ui, "Segoe UI", Arial, "Noto Sans", sans-serif';
     for (let i = 0; i < game.effects.messages.length; i++) {
       const message = game.effects.messages[i];
       const alpha = Math.max(0, Math.min(1, message.life / message.maxLife));
@@ -1945,7 +1994,7 @@ class Renderer {
     ctx.save();
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.font = game.mobile ? "800 13px Arial, sans-serif" : "800 15px Arial, sans-serif";
+    ctx.font = game.mobile ? '800 13px Inter, system-ui, "Segoe UI", Arial, "Noto Sans", sans-serif' : '800 15px Inter, system-ui, "Segoe UI", Arial, "Noto Sans", sans-serif';
     for (const indicator of game.effects.indicators) {
       const alpha = Math.max(0, Math.min(1, indicator.life / indicator.maxLife));
       const marginTop = game.mobile ? game.layout.topSafeArea + 12 : 18;
@@ -1972,7 +2021,22 @@ class Renderer {
 
 // src/entities/Bullet.js
 class Bullet {
-  constructor({
+  static pool = [];
+
+  static acquire(config) {
+    return (this.pool.pop() || new Bullet()).reset(config);
+  }
+
+  static release(bullet) {
+    if (!bullet || this.pool.length >= 260) return;
+    this.pool.push(bullet);
+  }
+
+  constructor(config = {}) {
+    this.reset(config);
+  }
+
+  reset({
     x,
     y,
     vx,
@@ -1988,6 +2052,8 @@ class Bullet {
     shape = "orb"
   }) {
     Object.assign(this, { x, y, vx, vy, r, damage, life, owner, color, homing, pierce, splash, shape });
+    this.grazed = false;
+    return this;
   }
 
   update(dt, game) {
@@ -2008,16 +2074,19 @@ class Bullet {
     this.vy += ((dy / d) * speed - this.vy) * dt * 3.5;
   }
 
-  draw(ctx) {
+  draw(ctx, game = null) {
+    const tier = game?.performanceTier || "normal";
+    const critical = tier === "critical";
+    const low = tier === "low";
     ctx.save();
-    ctx.globalCompositeOperation = "lighter";
+    ctx.globalCompositeOperation = critical ? "source-over" : "lighter";
     if (this.shape === "beam") {
       const angle = Math.atan2(this.vy, this.vx);
       ctx.translate(this.x, this.y);
       ctx.rotate(angle);
       ctx.strokeStyle = this.color;
       ctx.shadowColor = this.color;
-      ctx.shadowBlur = 16;
+      ctx.shadowBlur = critical ? 0 : low ? 6 : 16;
       ctx.lineWidth = this.r * 1.55;
       ctx.beginPath();
       ctx.moveTo(-this.r * 5.5, 0);
@@ -2033,14 +2102,18 @@ class Bullet {
       return;
     }
 
-    const glow = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.r * 4);
-    glow.addColorStop(0, "#ffffff");
-    glow.addColorStop(0.35, this.color);
-    glow.addColorStop(1, "rgba(0,0,0,0)");
-    ctx.fillStyle = glow;
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.r * 4, 0, Math.PI * 2);
-    ctx.fill();
+    if (!critical) {
+      ctx.globalAlpha = low ? 0.58 : 1;
+      const glow = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.r * (low ? 2.4 : 4));
+      glow.addColorStop(0, "#ffffff");
+      glow.addColorStop(0.35, this.color);
+      glow.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.r * (low ? 2.4 : 4), 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    }
     ctx.fillStyle = "#ffffff";
     ctx.beginPath();
     ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
@@ -2051,7 +2124,22 @@ class Bullet {
 
 // src/entities/Particle.js
 class Particle {
-  constructor(x, y, color, speed = 160, life = 0.5) {
+  static pool = [];
+
+  static acquire(x, y, color, speed = 160, life = 0.5) {
+    return (this.pool.pop() || new Particle()).reset(x, y, color, speed, life);
+  }
+
+  static release(particle) {
+    if (!particle || this.pool.length >= 220) return;
+    this.pool.push(particle);
+  }
+
+  constructor(x = 0, y = 0, color = "#ffffff", speed = 0, life = 0) {
+    this.reset(x, y, color, speed, life);
+  }
+
+  reset(x, y, color, speed = 160, life = 0.5) {
     const angle = Math.random() * Math.PI * 2;
     const velocity = speed * (0.25 + Math.random());
     this.x = x;
@@ -2062,6 +2150,7 @@ class Particle {
     this.color = color;
     this.life = life;
     this.maxLife = life;
+    return this;
   }
 
   update(dt) {
@@ -2072,9 +2161,9 @@ class Particle {
     this.life -= dt;
   }
 
-  draw(ctx) {
+  draw(ctx, game = null) {
     ctx.save();
-    ctx.globalCompositeOperation = "lighter";
+    ctx.globalCompositeOperation = game?.performanceTier === "critical" ? "source-over" : "lighter";
     ctx.globalAlpha = Math.max(0, this.life / this.maxLife);
     ctx.fillStyle = this.color;
     ctx.beginPath();
@@ -2130,7 +2219,8 @@ class Enemy {
 
     this.fireTimer -= dt;
     if (this.fireTimer <= 0 && this.y > 35) {
-      this.fire(game);
+      const load = game.enemyBullets.length / game.getPerformanceLimits().enemyBullets;
+      if (load < 0.8 || Math.random() > (load - 0.8) * 4) this.fire(game);
       const mobileFireScale = game.mobile ? BALANCE.mobile.hunterFireScale : 1;
       const bulletLoad = game.enemyBullets.length / game.getPerformanceLimits().enemyBullets;
       const loadScale = bulletLoad > 0.85 ? 1.35 : bulletLoad > 0.7 ? 1.16 : 1;
@@ -2139,9 +2229,9 @@ class Enemy {
 
     if (this.config.carrier && this.y > 40) {
       this.carrierTimer -= dt;
-      if (this.carrierTimer <= 0 && game.enemies.length < (game.mobile ? 18 : 28)) {
-        game.enemies.push(new Enemy("scout", this.x - 28, this.y + 18, 2, { vx: -36, vy: 160 }));
-        game.enemies.push(new Enemy("scout", this.x + 28, this.y + 18, 2, { vx: 36, vy: 160 }));
+      if (this.carrierTimer <= 0 && game.enemies.length < game.getPerformanceLimits().enemies - 2) {
+        game.addEnemy("scout", this.x - 28, this.y + 18, 2, { vx: -36, vy: 160 });
+        game.addEnemy("scout", this.x + 28, this.y + 18, 2, { vx: 36, vy: 160 });
         this.carrierTimer = game.mobile ? 5.1 : 4.2;
       }
     }
@@ -2153,13 +2243,14 @@ class Enemy {
       return;
     }
     if (this.config.bulletMode === "none") return;
+    if (game.enemyBullets.length >= game.getPerformanceLimits().enemyBullets) return;
     if (this.config.sniper) {
       const dx = game.player.x - this.x;
       const dy = game.player.y - this.y;
       const base = Math.atan2(dy, dx);
       const speed = 360 * (game.mobile ? BALANCE.mobile.enemyBulletScale : 1);
       game.effects.indicator(game.player.x, game.player.y - 44, "SHOT", 0.8, "#9fe8ff");
-      game.enemyBullets.push(new Bullet({
+      game.addEnemyBullet({
         x: this.x,
         y: this.y + this.r,
         vx: Math.cos(base) * speed,
@@ -2170,7 +2261,7 @@ class Enemy {
         owner: "enemy",
         color: "#9fe8ff",
         shape: "beam"
-      }));
+      });
       return;
     }
     const angles = this.config.bulletMode === "spread" ? [-0.22, 0, 0.22] : [0];
@@ -2180,7 +2271,7 @@ class Enemy {
       const base = Math.atan2(dy, dx) + offset;
       const speedScale = game.mobile ? BALANCE.mobile.enemyBulletScale : 1;
       const speed = (this.config.miniBoss ? 230 : this.config.bulletMode === "spread" ? 205 : 185) * speedScale;
-      game.enemyBullets.push(new Bullet({
+      if (!game.addEnemyBullet({
         x: this.x,
         y: this.y + this.r,
         vx: Math.cos(base) * speed,
@@ -2190,7 +2281,7 @@ class Enemy {
         life: 4,
         owner: "enemy",
         color: this.type === "shooter" ? "#c58cff" : "#ff6a4f"
-      }));
+      })) break;
     }
   }
 
@@ -2218,7 +2309,7 @@ class Enemy {
 
     this.fireTimer -= dt;
     if (this.fireTimer <= 0) {
-      this.fireHunter(game);
+      if (game.enemyBullets.length < game.getPerformanceLimits().enemyBullets * 0.8) this.fireHunter(game);
       const enraged = this.hp < this.maxHp * 0.4;
       this.fireTimer = (enraged ? 0.72 : 1.15) / this.fireRateScale;
     }
@@ -2226,8 +2317,8 @@ class Enemy {
     this.summonTimer -= dt;
     if (this.summonTimer <= 0) {
       game.warn("Hunter Summon");
-      game.enemies.push(new Enemy("shooter", Math.max(35, this.x - 95), this.y + 30, 4, { vx: -42, vy: 118 }));
-      game.enemies.push(new Enemy("shooter", Math.min(game.width - 35, this.x + 95), this.y + 30, 4, { vx: 42, vy: 118 }));
+      game.addEnemy("shooter", Math.max(35, this.x - 95), this.y + 30, 4, { vx: -42, vy: 118 });
+      game.addEnemy("shooter", Math.min(game.width - 35, this.x + 95), this.y + 30, 4, { vx: 42, vy: 118 });
       this.summonTimer = 8.5;
     }
 
@@ -2259,7 +2350,7 @@ class Enemy {
       const t = count === 1 ? 0 : i / (count - 1) - 0.5;
       const angle = base + t * spread;
       const speed = (enraged ? 245 : 215) * (game.mobile ? BALANCE.mobile.enemyBulletScale : 1);
-      game.enemyBullets.push(new Bullet({
+      if (!game.addEnemyBullet({
         x: this.x,
         y: this.y + this.r * 0.6,
         vx: Math.cos(angle) * speed,
@@ -2269,7 +2360,7 @@ class Enemy {
         life: 4.4,
         owner: "enemy",
         color: "#77e7ff"
-      }));
+      })) break;
     }
   }
 
@@ -2279,7 +2370,7 @@ class Enemy {
     return this.hp <= 0;
   }
 
-  draw(ctx) {
+  draw(ctx, game = null) {
     ctx.save();
     ctx.translate(this.x, this.y);
     const s = this.r / 23;
@@ -2327,7 +2418,7 @@ class Enemy {
     if (this.config.shieldAura) {
       ctx.save();
       ctx.scale(1 / s, 1 / s);
-      ctx.strokeStyle = "rgba(127,255,208,0.35)";
+      ctx.strokeStyle = game?.performanceTier === "critical" ? "rgba(127,255,208,0.16)" : "rgba(127,255,208,0.35)";
       ctx.lineWidth = 3;
       ctx.beginPath();
       ctx.arc(0, 0, 104, 0, Math.PI * 2);
@@ -2374,8 +2465,8 @@ class Boss {
     if (this.phase >= 2) {
       this.summonTimer -= dt;
       if (this.summonTimer <= 0) {
-        game.enemies.push(new Enemy("scout", this.x - 90, this.y + 25, 5));
-        game.enemies.push(new Enemy("fighter", this.x + 90, this.y + 25, 5));
+        game.addEnemy("scout", this.x - 90, this.y + 25, 5);
+        game.addEnemy("fighter", this.x + 90, this.y + 25, 5);
         this.summonTimer = 8;
       }
     }
@@ -2403,6 +2494,7 @@ class Boss {
   }
 
   fire(game) {
+    if (game.enemyBullets.length >= game.getPerformanceLimits().enemyBullets) return;
     const count = this.phase === 1 ? 3 : this.phase === 2 ? 7 : 9;
     const spread = this.phase === 1 ? 0.34 : this.phase === 2 ? 0.72 : 0.95;
     const base = Math.atan2(game.player.y - this.y, game.player.x - this.x);
@@ -2410,7 +2502,7 @@ class Boss {
       const t = count === 1 ? 0 : i / (count - 1) - 0.5;
       const angle = base + t * spread;
       const speed = this.phase === 3 ? 260 : 220;
-      game.enemyBullets.push(new Bullet({
+      if (!game.addEnemyBullet({
         x: this.x,
         y: this.y + this.r * 0.55,
         vx: Math.cos(angle) * speed,
@@ -2420,7 +2512,7 @@ class Boss {
         life: 5,
         owner: "enemy",
         color: "#ff6a4f"
-      }));
+      })) break;
     }
   }
 
@@ -2430,11 +2522,11 @@ class Boss {
     return this.hp <= 0;
   }
 
-  draw(ctx, height) {
+  draw(ctx, height, game = null) {
     ctx.save();
     ctx.translate(this.x, this.y);
     ctx.shadowColor = "rgba(255,106,106,0.45)";
-    ctx.shadowBlur = 25;
+    ctx.shadowBlur = game?.performanceTier === "critical" ? 0 : game?.performanceTier === "low" ? 9 : 25;
     ctx.fillStyle = this.hitFlash > 0 ? "#ffffff" : this.phase === 3 ? "#ff6a6a" : this.phase === 2 ? "#ffcf5d" : "#aeb8c6";
     ctx.strokeStyle = "#fff4c5";
     ctx.lineWidth = 3;
@@ -2632,7 +2724,7 @@ class Player {
       const radiusBonus = weapon.id === "plasma" ? (level - 1) * 0.75 : (level - 1) * 0.35;
       const pierceBonus = weapon.id === "laser" ? level - 1 : weapon.id === "plasma" && level >= 3 ? 1 : 0;
       const splashBonus = weapon.id === "flak" ? (level - 1) * 14 : 0;
-      game.playerBullets.push(new Bullet({
+      game.addPlayerBullet({
         x: this.x + angle * 64,
         y: this.y - 28,
         vx: Math.sin(angle) * speed,
@@ -2645,7 +2737,7 @@ class Player {
         pierce: (weapon.pierce || 0) + pierceBonus,
         splash: (weapon.splash || 0) + splashBonus,
         shape: weapon.shape || "orb"
-      }));
+      });
     }
     game.effects.burst(this.x, this.y - 28, weapon.color, 5 + spread + Math.floor(angles.length / 2), 140, 0.22);
     game.audio.play("shoot");
@@ -2670,7 +2762,7 @@ class Player {
     this.missileTimer -= dt;
     if (this.missileTimer > 0) return;
     this.missileTimer = Math.max(1.0, BALANCE.missileInterval - this.stats.missile * 0.45);
-    game.playerBullets.push(new Bullet({
+    game.addPlayerBullet({
       x: this.x,
       y: this.y - 18,
       vx: 0,
@@ -2680,7 +2772,7 @@ class Player {
       life: 4,
       color: "#ffe66d",
       homing: true
-    }));
+    });
     game.audio.play("shoot");
   }
 
@@ -2715,7 +2807,7 @@ class Player {
     if (this.health <= 0) game.gameOver();
   }
 
-  draw(ctx) {
+  draw(ctx, game = null) {
     ctx.save();
     ctx.translate(this.x, this.y);
     if (this.invincible > 0 && Math.floor(this.invincible * 18) % 2 === 0) ctx.globalAlpha = 0.58;
@@ -2743,7 +2835,7 @@ class Player {
     const shipColor = this.ship.color || "#77e7ff";
     const shipAccent = this.ship.accent || "#d9f5ff";
     ctx.shadowColor = shipColor;
-    ctx.shadowBlur = 18;
+    ctx.shadowBlur = game?.performanceTier === "critical" ? 0 : game?.performanceTier === "low" ? 7 : 18;
     ctx.fillStyle = shipColor;
     ctx.strokeStyle = shipAccent;
     ctx.lineWidth = 2;
@@ -2832,7 +2924,22 @@ const POWER_UP_META = {
 };
 
 class PowerUp {
-  constructor(x, y, type = "energy") {
+  static pool = [];
+
+  static acquire(x, y, type = "energy") {
+    return (this.pool.pop() || new PowerUp()).reset(x, y, type);
+  }
+
+  static release(powerUp) {
+    if (!powerUp || this.pool.length >= 24) return;
+    this.pool.push(powerUp);
+  }
+
+  constructor(x = 0, y = 0, type = "energy") {
+    this.reset(x, y, type);
+  }
+
+  reset(x, y, type = "energy") {
     this.x = x;
     this.y = y;
     this.vx = (Math.random() - 0.5) * 70;
@@ -2841,6 +2948,7 @@ class PowerUp {
     this.type = type;
     this.spin = Math.random() * Math.PI * 2;
     this.life = 8;
+    return this;
   }
 
   update(dt, game = null) {
@@ -2879,26 +2987,30 @@ class PowerUp {
     ctx.save();
     ctx.translate(this.x, this.y);
     ctx.rotate(this.spin);
-    ctx.globalCompositeOperation = "lighter";
+    const critical = game?.performanceTier === "critical";
+    const low = game?.performanceTier === "low";
+    ctx.globalCompositeOperation = critical ? "source-over" : "lighter";
     const weapon = this.weapon();
     const meta = this.meta();
     const color = weapon ? weapon.color : meta.color;
     const pulse = 1 + Math.sin(performance.now() / 130 + this.spin) * 0.08;
-    const glow = ctx.createRadialGradient(0, 0, 0, 0, 0, 36 * pulse);
-    glow.addColorStop(0, "rgba(255,255,255,0.95)");
-    glow.addColorStop(0.34, color);
-    glow.addColorStop(1, "rgba(0,0,0,0)");
-    ctx.fillStyle = glow;
-    ctx.beginPath();
-    ctx.arc(0, 0, 34 * pulse, 0, Math.PI * 2);
-    ctx.fill();
+    if (!critical) {
+      const glow = ctx.createRadialGradient(0, 0, 0, 0, 0, (low ? 24 : 36) * pulse);
+      glow.addColorStop(0, "rgba(255,255,255,0.95)");
+      glow.addColorStop(0.34, color);
+      glow.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.arc(0, 0, (low ? 23 : 34) * pulse, 0, Math.PI * 2);
+      ctx.fill();
+    }
     ctx.fillStyle = "rgba(5,18,32,0.82)";
     ctx.strokeStyle = color;
     ctx.lineWidth = 3;
     this.drawShape(ctx, meta.shape);
     ctx.rotate(-this.spin);
     ctx.fillStyle = color;
-    ctx.font = "800 13px Arial";
+    ctx.font = '800 13px Inter, system-ui, "Segoe UI", Arial, "Noto Sans", sans-serif';
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillText(this.shortLabel(), 0, 0);
@@ -2906,14 +3018,14 @@ class PowerUp {
     const mobile = Boolean(game?.mobile);
     const main = this.label(game);
     const sub = this.subLabel(game);
-    ctx.font = `800 ${mobile ? 8 : 10}px Arial`;
+    ctx.font = `800 ${mobile ? 8 : 10}px Inter, system-ui, "Segoe UI", Arial, "Noto Sans", sans-serif`;
     ctx.lineWidth = mobile ? 2 : 3;
     ctx.strokeStyle = "rgba(5,18,32,0.9)";
     ctx.fillStyle = color;
     ctx.strokeText(main, 0, 30);
     ctx.fillText(main, 0, 30);
     if (sub) {
-      ctx.font = `800 ${mobile ? 7 : 8}px Arial`;
+      ctx.font = `800 ${mobile ? 7 : 8}px Inter, system-ui, "Segoe UI", Arial, "Noto Sans", sans-serif`;
       ctx.strokeText(sub, 0, 40);
       ctx.fillText(sub, 0, 40);
     }
@@ -3008,6 +3120,7 @@ class EffectsSystem {
   }
 
   reset() {
+    for (const particle of this.particles) Particle.release(particle);
     this.particles.length = 0;
     this.clouds.length = 0;
     this.lightnings.length = 0;
@@ -3034,8 +3147,8 @@ class EffectsSystem {
     const particleCount = Math.max(1, Math.ceil((this.game.mobile ? count * 0.64 : count) * this.game.getEffectScale()));
     const particleSpeed = this.game.mobile ? speed * 0.86 : speed;
     for (let i = 0; i < particleCount; i++) {
-      if (this.particles.length >= this.maxParticles) this.particles.shift();
-      this.particles.push(new Particle(x, y, color, particleSpeed, life));
+      if (this.particles.length >= this.maxParticles) Particle.release(this.particles.shift());
+      this.particles.push(Particle.acquire(x, y, color, particleSpeed, life));
     }
   }
 
@@ -3113,30 +3226,36 @@ class EffectsSystem {
       }
     }
 
-    this.clouds = this.clouds.filter((cloud) => {
+    this.compact(this.clouds, (cloud) => {
       cloud.y += cloud.vy * dt;
       return cloud.y <= this.game.height + 130;
     });
-
-    this.particles = this.particles.filter((particle) => {
+    this.compact(this.particles, (particle) => {
       particle.update(dt);
       return particle.life > 0;
-    });
-
-    this.lightnings = this.lightnings.filter((bolt) => {
+    }, Particle.release.bind(Particle));
+    this.compact(this.lightnings, (bolt) => {
       bolt.life -= dt;
       return bolt.life > 0;
     });
-
-    this.messages = this.messages.filter((message) => {
+    this.compact(this.messages, (message) => {
       message.life -= dt;
       return message.life > 0;
     });
-
-    this.indicators = this.indicators.filter((indicator) => {
+    this.compact(this.indicators, (indicator) => {
       indicator.life -= dt;
       return indicator.life > 0;
     });
+  }
+
+  compact(items, keep, release = null) {
+    let write = 0;
+    for (let read = 0; read < items.length; read++) {
+      const item = items[read];
+      if (keep(item)) items[write++] = item;
+      else if (release) release(item);
+    }
+    items.length = write;
   }
 }
 
@@ -3238,7 +3357,10 @@ class AudioSystem {
 
   bind() {
     if (!this.button) return;
-    this.button.addEventListener("pointerdown", (event) => event.stopPropagation());
+    this.button.addEventListener("pointerdown", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+    });
     this.button.addEventListener("click", (event) => {
       event.preventDefault();
       this.setMuted(!this.muted);
@@ -3275,7 +3397,7 @@ class AudioSystem {
 
   updateButton() {
     if (!this.button) return;
-    this.button.textContent = this.muted ? "Sound Off" : "Sound On";
+    this.button.textContent = t(this.muted ? "common.soundOff" : "common.soundOn");
     this.button.setAttribute("aria-pressed", String(this.muted));
   }
 
@@ -3395,7 +3517,7 @@ class SpawnSystem {
     const type = stage.enemies[Math.floor(Math.random() * stage.enemies.length)];
     const r = 32;
     const x = r + Math.random() * (this.game.width - r * 2);
-    this.game.enemies.push(new Enemy(type, x, -44, stage.id));
+    this.game.addEnemy(type, x, -44, stage.id);
   }
 
   updateWaves(stage) {
@@ -3410,6 +3532,8 @@ class SpawnSystem {
   }
 
   spawnWave(stage, wave) {
+    const load = this.game.enemies.length / this.game.getPerformanceLimits().enemies;
+    if (load >= 1 || (load > 0.8 && wave.pattern !== "miniBoss")) return;
     const dangerous = wave.danger || ["sides", "wall", "rain", "ambush", "elite"].includes(wave.pattern) || wave.type === "tank" || wave.type === "shooter" || (wave.count || 0) >= 6;
     if (dangerous && wave.pattern !== "miniBoss") {
       this.game.warn("Danger Wave");
@@ -3429,7 +3553,7 @@ class SpawnSystem {
     const count = this.mobileCount(wave.count || 5);
     const gap = this.game.width / (count + 1);
     for (let i = 0; i < count; i++) {
-      this.game.enemies.push(new Enemy(wave.type, gap * (i + 1), -45 - i * 12, stage.id, { vy: 105 + stage.id * 12 }));
+      this.game.addEnemy(wave.type, gap * (i + 1), -45 - i * 12, stage.id, { vy: 105 + stage.id * 12 });
     }
   }
 
@@ -3439,7 +3563,7 @@ class SpawnSystem {
     for (let i = 0; i < count; i++) {
       const offset = (i - (count - 1) / 2) * 58;
       const depth = Math.abs(i - (count - 1) / 2) * 28;
-      this.game.enemies.push(new Enemy(wave.type, center + offset, -50 - depth, stage.id, { vy: 118 + stage.id * 10 }));
+      this.game.addEnemy(wave.type, center + offset, -50 - depth, stage.id, { vy: 118 + stage.id * 10 });
     }
   }
 
@@ -3449,13 +3573,13 @@ class SpawnSystem {
       const left = i % 2 === 0;
       const x = left ? 28 : this.game.width - 28;
       const vx = left ? 95 : -95;
-      this.game.enemies.push(new Enemy(wave.type, x, -45 - i * 18, stage.id, { vx, vy: 120 + stage.id * 8 }));
+      this.game.addEnemy(wave.type, x, -45 - i * 18, stage.id, { vx, vy: 120 + stage.id * 8 });
     }
   }
 
   spawnMiniBoss(stage, wave) {
     const type = wave.type || "warden";
-    this.game.enemies.push(new Enemy(type, this.game.width / 2, -80, stage.id, { vx: 0, vy: 52 }));
+    this.game.addEnemy(type, this.game.width / 2, -80, stage.id, { vx: 0, vy: 52 });
     this.game.warn("Mini Boss Incoming");
   }
 
@@ -3518,7 +3642,7 @@ class SpawnSystem {
       fireRateScale: difficulty.fireRateScale,
       scoreScale: difficulty.scoreScale
     } : {};
-    this.game.enemies.push(new Enemy(type, x, y, stageId, { ...scaled, ...options }));
+    this.game.addEnemy(type, x, y, stageId, { ...scaled, ...options });
   }
 
   updateEndless(dt) {
@@ -3544,13 +3668,13 @@ class SpawnSystem {
 
     if (this.endlessMiniBossTimer <= 0) {
       this.game.warn("Endless Mini Boss");
-      this.game.enemies.push(new Enemy("warden", this.game.width / 2, -90, 6, {
+      this.game.addEnemy("warden", this.game.width / 2, -90, 6, {
         vx: 0,
         vy: 48 + difficulty.minutes * 2,
         hpScale: difficulty.hpScale,
         fireRateScale: difficulty.fireRateScale,
         scoreScale: difficulty.scoreScale
-      }));
+      });
       this.endlessMiniBossTimer = Math.max(this.game.mobile ? 34 : 24, 42 - difficulty.minutes * 2);
     }
   }
@@ -3576,12 +3700,12 @@ class SpawnSystem {
     const type = types[Math.floor(Math.random() * types.length)];
     const r = 32;
     const x = r + Math.random() * (this.game.width - r * 2);
-    this.game.enemies.push(new Enemy(type, x, -44, 6, {
+    this.game.addEnemy(type, x, -44, 6, {
       hpScale: difficulty.hpScale,
       speedScale: difficulty.speedScale,
       fireRateScale: difficulty.fireRateScale,
       scoreScale: difficulty.scoreScale
-    }));
+    });
   }
 
   spawnEndlessWave(difficulty) {
@@ -3606,12 +3730,12 @@ class SpawnSystem {
     const count = this.mobileCount(wave.count || 6);
     for (let i = 0; i < count; i++) {
       const x = ((i + 1) / (count + 1)) * this.game.width;
-      this.game.enemies.push(new Enemy(wave.type, x, -45 - i * 10, stage.id, {
+      this.game.addEnemy(wave.type, x, -45 - i * 10, stage.id, {
         hpScale: difficulty.hpScale,
         speedScale: difficulty.speedScale,
         fireRateScale: difficulty.fireRateScale,
         scoreScale: difficulty.scoreScale
-      }));
+      });
     }
   }
 
@@ -3622,13 +3746,13 @@ class SpawnSystem {
       const side = i % 2 === 0 ? -1 : 1;
       const row = Math.floor(i / 2) + 1;
       const x = center + side * row * 48;
-      this.game.enemies.push(new Enemy(wave.type, x, -45 - row * 24, stage.id, {
+      this.game.addEnemy(wave.type, x, -45 - row * 24, stage.id, {
         vx: side * 18,
         hpScale: difficulty.hpScale,
         speedScale: difficulty.speedScale,
         fireRateScale: difficulty.fireRateScale,
         scoreScale: difficulty.scoreScale
-      }));
+      });
     }
   }
 
@@ -3636,13 +3760,13 @@ class SpawnSystem {
     const count = this.mobileCount(wave.count || 6);
     for (let i = 0; i < count; i++) {
       const left = i % 2 === 0;
-      this.game.enemies.push(new Enemy(wave.type, left ? -24 : this.game.width + 24, -40 - i * 22, stage.id, {
+      this.game.addEnemy(wave.type, left ? -24 : this.game.width + 24, -40 - i * 22, stage.id, {
         vx: left ? 76 : -76,
         vy: (120 + i * 3) * difficulty.speedScale,
         hpScale: difficulty.hpScale,
         fireRateScale: difficulty.fireRateScale,
         scoreScale: difficulty.scoreScale
-      }));
+      });
     }
   }
 
@@ -3685,7 +3809,7 @@ class StageSystem {
     this.game.state.set(STATES.STAGE_CLEAR);
     this.game.awardStageClearBonus(this.stageId);
     this.game.enemies.length = 0;
-    this.game.enemyBullets.length = 0;
+    this.game.clearEnemyBullets();
     this.game.effects.explode(this.game.width / 2, this.game.height * 0.35, true);
     this.game.openUpgrade();
   }
@@ -3747,11 +3871,11 @@ class Hud {
     if (this.elements.comboFill) this.elements.comboFill.style.width = `${Math.max(0, Math.min(1, game.combo.timer / game.combo.maxTimer)) * 100}%`;
     if (this.elements.endlessText) {
       this.elements.endlessText.textContent = game.state.is(game.states.ENDLESS)
-        ? `Endless ${Math.floor(game.endless.time)}s | x${game.endless.multiplier.toFixed(2)}`
-        : `Best Endless ${Math.floor(game.save.best.endlessTime || 0)}s`;
+        ? `${t("hud.endless")} ${Math.floor(game.endless.time)}s | x${game.endless.multiplier.toFixed(2)}`
+        : `${t("hud.bestEndless")} ${Math.floor(game.save.best.endlessTime || 0)}s`;
     }
     this.elements.health.style.width = `${Math.max(0, (player.health / player.maxHealth) * 100)}%`;
-    this.elements.stage.textContent = stage ? stage.name : t("hud.stage");
+    this.elements.stage.textContent = stage ? `${t("hud.stage")} ${stage.id}` : t("hud.stage");
     this.elements.time.textContent = stage && !stage.boss ? `${Math.ceil(game.stageSystem.timer)}s` : t("hud.boss");
     if (this.elements.energy) this.elements.energy.style.width = `${Math.max(0, (player.energy / 100) * 100)}%`;
     if (this.elements.energyText) {
@@ -3761,8 +3885,8 @@ class Hud {
     }
     if (this.elements.powerTimers) {
       const timers = [];
-      if (player.rapidTimer > 0) timers.push(`Rapid ${Math.ceil(player.rapidTimer)}s`);
-      if (player.magnetTimer > 0) timers.push(`Magnet ${Math.ceil(player.magnetTimer)}s`);
+      if (player.rapidTimer > 0) timers.push(`${t("power.rapidTimer")} ${Math.ceil(player.rapidTimer)}s`);
+      if (player.magnetTimer > 0) timers.push(`${t("power.magnetTimer")} ${Math.ceil(player.magnetTimer)}s`);
       this.elements.powerTimers.textContent = timers.join(" | ");
       this.elements.powerTimers.classList.toggle("hidden", timers.length === 0);
     }
@@ -3809,6 +3933,10 @@ class Menu {
     button.type = "button";
     button.textContent = text;
     button.className = tone ? `pause-action ${tone}` : "pause-action";
+    button.addEventListener("pointerdown", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+    });
     return button;
   }
 
@@ -3844,6 +3972,11 @@ class Menu {
     this.startHandler = this.defaultStartHandler;
     this.show("Sky Thunder", t("menu.intro"), t("menu.start"), true);
     this.hangarButton.textContent = t("menu.hangar");
+    this.elements.controls.innerHTML = [
+      `${t("controls.moveFire")}: ${t("controls.leftMouse")} / WASD / Arrow Keys`,
+      `${t("controls.thunder")}: ${t("controls.rightKeys")}`,
+      `${t("controls.pause")}: ${t("controls.pauseKeys")}`
+    ].join("<br>");
   }
 
   show(title, text, buttonText, showControls = false, secondaryText = "") {
@@ -4021,9 +4154,9 @@ class Game {
     this.stats = { enemiesDestroyed: 0, stageReached: 1, maxCombo: 1, endlessTime: 0, stageHits: 0, totalHits: 0, bossTime: 0, stageKills: 0, stageDamageTaken: 0, creditsEarned: 0 };
     this.combo = { count: 0, multiplier: 1, timer: 0, maxTimer: 3.2 };
     this.endless = { active: false, time: 0, multiplier: 1, survivalBonusTimer: 0 };
-    this.debug = { visible: false, fps: 60, frames: 0, elapsed: 0 };
+    this.debug = { visible: false, fps: 60, averageFps: 60, frames: 0, elapsed: 0 };
     this.performanceTier = "normal";
-    this.performanceSamples = { low: 0, critical: 0, recovery: 0 };
+    this.performanceSamples = { lowSeconds: 0, criticalSeconds: 0, recoverySeconds: 0 };
     this.stageResult = null;
     this.mobile = false;
     this.layout = {
@@ -4069,25 +4202,37 @@ class Game {
     this.input.setViewportProvider(() => ({ width: this.width, height: this.height }));
     this.audio.bind();
     if (this.hud.elements.skillButton) {
-      this.hud.elements.skillButton.addEventListener("pointerdown", (event) => event.stopPropagation());
+      this.hud.elements.skillButton.addEventListener("pointerdown", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+      });
       this.hud.elements.skillButton.addEventListener("click", (event) => {
         event.preventDefault();
         this.input.requestSkill();
       });
     }
     if (this.hud.elements.pauseButton) {
-      this.hud.elements.pauseButton.addEventListener("pointerdown", (event) => event.stopPropagation());
+      this.hud.elements.pauseButton.addEventListener("pointerdown", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+      });
       this.hud.elements.pauseButton.addEventListener("click", (event) => {
         event.preventDefault();
         this.togglePause();
       });
     }
     if (this.hud.elements.dockPauseButton) {
-      this.hud.elements.dockPauseButton.addEventListener("pointerdown", (event) => event.stopPropagation());
+      this.hud.elements.dockPauseButton.addEventListener("pointerdown", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+      });
       this.hud.elements.dockPauseButton.addEventListener("click", () => this.togglePause());
     }
     if (this.hud.elements.languageButton) {
-      this.hud.elements.languageButton.addEventListener("pointerdown", (event) => event.stopPropagation());
+      this.hud.elements.languageButton.addEventListener("pointerdown", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+      });
       this.hud.elements.languageButton.addEventListener("click", () => {
         this.lang = toggleLanguage();
         this.refreshLanguage();
@@ -4203,10 +4348,10 @@ class Game {
     this.endless = { active: false, time: 0, multiplier: 1, survivalBonusTimer: 0 };
     this.debug.frames = 0;
     this.debug.elapsed = 0;
-    this.playerBullets.length = 0;
-    this.enemyBullets.length = 0;
+    this.releaseAll(this.playerBullets, Bullet.release.bind(Bullet));
+    this.releaseAll(this.enemyBullets, Bullet.release.bind(Bullet));
     this.enemies.length = 0;
-    this.powerUps.length = 0;
+    this.releaseAll(this.powerUps, PowerUp.release.bind(PowerUp));
     this.boss = null;
     this.stageResult = null;
     this.player.reset(this.width, this.height, getShip(this.save.best.selectedShipId));
@@ -4224,10 +4369,10 @@ class Game {
     this.endless.survivalBonusTimer = 0;
     this.stats.stageReached = Math.max(this.stats.stageReached, 6);
     this.boss = null;
-    this.playerBullets.length = 0;
-    this.enemyBullets.length = 0;
+    this.releaseAll(this.playerBullets, Bullet.release.bind(Bullet));
+    this.releaseAll(this.enemyBullets, Bullet.release.bind(Bullet));
     this.enemies.length = 0;
-    this.powerUps.length = 0;
+    this.releaseAll(this.powerUps, PowerUp.release.bind(PowerUp));
     this.spawnSystem.reset();
     this.state.set(STATES.ENDLESS);
     this.menu.hide();
@@ -4284,23 +4429,38 @@ class Game {
   }
 
   updateEntities(dt) {
-    this.playerBullets = this.playerBullets.filter((bullet) => {
+    this.compactInPlace(this.playerBullets, (bullet) => {
       bullet.update(dt, this);
       return bullet.life > 0 && bullet.y > -80 && bullet.y < this.height + 80 && bullet.x > -80 && bullet.x < this.width + 80;
-    });
-    this.enemyBullets = this.enemyBullets.filter((bullet) => {
+    }, Bullet.release.bind(Bullet));
+    this.compactInPlace(this.enemyBullets, (bullet) => {
       bullet.update(dt, this);
-      return bullet.life > 0 && bullet.y < this.height + 80;
-    });
-    this.enemies = this.enemies.filter((enemy) => {
+      return bullet.life > 0 && bullet.y > -80 && bullet.y < this.height + 80 && bullet.x > -80 && bullet.x < this.width + 80;
+    }, Bullet.release.bind(Bullet));
+    this.compactInPlace(this.enemies, (enemy) => {
       enemy.update(dt, this);
       return enemy.y <= this.height + 80 && enemy.hp > 0;
     });
-    this.powerUps = this.powerUps.filter((powerUp) => {
+    this.compactInPlace(this.powerUps, (powerUp) => {
       powerUp.update(dt, this);
       return powerUp.life > 0 && powerUp.y < this.height + 50;
-    });
+    }, PowerUp.release.bind(PowerUp));
     this.enforceSoftCaps();
+  }
+
+  compactInPlace(items, keep, release = null) {
+    let write = 0;
+    for (let read = 0; read < items.length; read++) {
+      const item = items[read];
+      if (keep(item)) items[write++] = item;
+      else if (release) release(item);
+    }
+    items.length = write;
+  }
+
+  releaseAll(items, release) {
+    for (const item of items) release(item);
+    items.length = 0;
   }
 
   enforceSoftCaps() {
@@ -4315,18 +4475,21 @@ class Game {
   trimOldest(items, cap) {
     if (items.length <= cap) return;
     const excess = items.length - cap;
-    items.splice(0, excess);
+    const removed = items.splice(0, excess);
+    if (items === this.playerBullets || items === this.enemyBullets) removed.forEach(Bullet.release.bind(Bullet));
+    else if (items === this.powerUps) removed.forEach(PowerUp.release.bind(PowerUp));
+    else if (items === this.effects.particles) removed.forEach(Particle.release.bind(Particle));
   }
 
   getPerformanceLimits() {
     const desktop = {
-      normal: { playerBullets: 160, enemyBullets: 220, particles: 200, powerUps: 16, enemies: 34 },
-      low: { playerBullets: 130, enemyBullets: 180, particles: 140, powerUps: 12, enemies: 28 },
-      critical: { playerBullets: 100, enemyBullets: 140, particles: 90, powerUps: 10, enemies: 22 }
+      normal: { playerBullets: 140, enemyBullets: 180, particles: 180, powerUps: 14, enemies: 32 },
+      low: { playerBullets: 100, enemyBullets: 130, particles: 110, powerUps: 10, enemies: 24 },
+      critical: { playerBullets: 70, enemyBullets: 90, particles: 60, powerUps: 8, enemies: 18 }
     };
     const limits = { ...desktop[this.performanceTier] };
     if (this.mobile) {
-      for (const key of Object.keys(limits)) limits[key] = Math.max(8, Math.floor(limits[key] * 0.8));
+      for (const key of Object.keys(limits)) limits[key] = Math.max(6, Math.floor(limits[key] * 0.75));
     }
     return limits;
   }
@@ -4335,11 +4498,39 @@ class Game {
     return this.performanceTier === "critical" ? 0.18 : this.performanceTier === "low" ? 0.42 : 1;
   }
 
+  addPlayerBullet(config) {
+    if (this.playerBullets.length >= this.getPerformanceLimits().playerBullets) return false;
+    this.playerBullets.push(Bullet.acquire(config));
+    return true;
+  }
+
+  addEnemyBullet(config) {
+    if (this.enemyBullets.length >= this.getPerformanceLimits().enemyBullets) return false;
+    this.enemyBullets.push(Bullet.acquire(config));
+    return true;
+  }
+
+  clearEnemyBullets() {
+    this.releaseAll(this.enemyBullets, Bullet.release.bind(Bullet));
+  }
+
+  addPowerUp(x, y, type) {
+    if (this.powerUps.length >= this.getPerformanceLimits().powerUps) return false;
+    this.powerUps.push(PowerUp.acquire(x, y, type));
+    return true;
+  }
+
+  addEnemy(type, x, y, stageId = 1, options = {}) {
+    if (this.enemies.length >= this.getPerformanceLimits().enemies) return false;
+    this.enemies.push(new Enemy(type, x, y, stageId, options));
+    return true;
+  }
+
   checkCollisions() {
     for (let i = this.playerBullets.length - 1; i >= 0; i--) {
       const bullet = this.playerBullets[i];
       if (this.boss && circleHit(bullet, this.boss, bullet.r, this.boss.r * 0.9)) {
-        this.playerBullets.splice(i, 1);
+        Bullet.release(this.playerBullets.splice(i, 1)[0]);
         if (this.boss.takeDamage(bullet.damage)) this.defeatBoss();
         continue;
       }
@@ -4348,7 +4539,7 @@ class Game {
         const enemy = this.enemies[j];
         if (!circleHit(bullet, enemy)) continue;
         if (bullet.pierce > 0) bullet.pierce -= 1;
-        else this.playerBullets.splice(i, 1);
+        else Bullet.release(this.playerBullets.splice(i, 1)[0]);
         this.effects.burst(bullet.x, bullet.y, bullet.color || "#ffe66d", 6, 90, 0.25);
         const killed = enemy.takeDamage(this.damageAfterEnemyAura(enemy, bullet.damage));
         if (bullet.splash > 0) this.splashDamage(bullet, enemy);
@@ -4361,7 +4552,7 @@ class Game {
       const bullet = this.enemyBullets[i];
       this.checkGraze(bullet);
       if (!circleHit(bullet, this.player)) continue;
-      this.enemyBullets.splice(i, 1);
+      Bullet.release(this.enemyBullets.splice(i, 1)[0]);
       this.player.takeDamage(bullet.damage, this);
     }
 
@@ -4379,6 +4570,7 @@ class Game {
       if (!circleHit(powerUp, this.player)) continue;
       this.powerUps.splice(i, 1);
       this.applyPowerUp(powerUp);
+      PowerUp.release(powerUp);
       this.addScore(15);
       this.effects.burst(this.player.x, this.player.y, "#7fffd0", 20, 200, 0.55);
     }
@@ -4436,7 +4628,8 @@ class Game {
       if (enemy.takeDamage(damage)) this.killEnemy(i, enemy);
       else this.effects.burst(enemy.x, enemy.y, "#ff8a5c", 7, 120, 0.28);
     }
-    this.enemyBullets.splice(0, Math.ceil(this.enemyBullets.length * 0.72));
+    const removed = this.enemyBullets.splice(0, Math.ceil(this.enemyBullets.length * 0.72));
+    removed.forEach(Bullet.release.bind(Bullet));
     this.effects.explode(px, py - 40, false);
     this.shake = Math.min(this.mobile ? 10 : 16, this.shake + (this.mobile ? 6 : 10));
   }
@@ -4450,7 +4643,7 @@ class Game {
     this.addScore(enemy.config.score * (enemy.scoreScale || 1), true);
     this.player.energy = Math.min(BALANCE.thunder.maxEnergy, this.player.energy + this.energyGain(enemy.config.miniBoss ? 18 : BALANCE.thunder.chargePerKill));
     if (Math.random() < this.dropChance(enemy)) {
-      this.powerUps.push(new PowerUp(enemy.x, enemy.y, this.rollPowerUpType(enemy)));
+      this.addPowerUp(enemy.x, enemy.y, this.rollPowerUpType(enemy));
     }
     this.effects.explode(enemy.x, enemy.y, enemy.type === "tank");
     this.audio.play("explosion");
@@ -4623,15 +4816,18 @@ class Game {
     this.debug.frames += 1;
     this.debug.elapsed += dt;
     if (this.debug.elapsed >= 1.2) {
-      this.debug.fps = Math.round(this.debug.frames / this.debug.elapsed);
+      const sampleSeconds = this.debug.elapsed;
+      this.debug.fps = Math.round(this.debug.frames / sampleSeconds);
+      this.debug.averageFps = Math.round(this.debug.averageFps * 0.72 + this.debug.fps * 0.28);
       this.debug.frames = 0;
       this.debug.elapsed = 0;
-      this.updatePerformanceTier();
+      this.updatePerformanceTier(sampleSeconds);
     }
     const overlay = this.hud.elements.debugOverlay;
     if (!overlay || !this.debug.visible) return;
     overlay.textContent = [
       `FPS ${this.debug.fps}`,
+      `Avg FPS ${this.debug.averageFps}`,
       `Tier ${this.performanceTier}`,
       `DPR ${this.dpr.toFixed(2)}`,
       `State ${this.state.state}`,
@@ -4644,18 +4840,20 @@ class Game {
     ].join("\n");
   }
 
-  updatePerformanceTier() {
-    const fps = this.debug.fps;
-    this.performanceSamples.critical = fps < 35 ? this.performanceSamples.critical + 1 : 0;
-    this.performanceSamples.low = fps < 45 ? this.performanceSamples.low + 1 : 0;
-    this.performanceSamples.recovery = fps >= 55 ? this.performanceSamples.recovery + 1 : 0;
+  updatePerformanceTier(sampleSeconds) {
+    const fps = this.debug.averageFps;
+    this.performanceSamples.criticalSeconds = fps < 32 ? this.performanceSamples.criticalSeconds + sampleSeconds : 0;
+    this.performanceSamples.lowSeconds = fps < 45 ? this.performanceSamples.lowSeconds + sampleSeconds : 0;
+    this.performanceSamples.recoverySeconds = fps >= 56 ? this.performanceSamples.recoverySeconds + sampleSeconds : 0;
     let next = this.performanceTier;
-    if (this.performanceSamples.critical >= 2) next = "critical";
-    else if (this.performanceSamples.low >= 3 && this.performanceTier === "normal") next = "low";
-    else if (this.performanceSamples.recovery >= 3) next = this.performanceTier === "critical" ? "low" : "normal";
+    if (this.performanceSamples.criticalSeconds >= 1.5) next = "critical";
+    else if (this.performanceSamples.lowSeconds >= 2 && this.performanceTier === "normal") next = "low";
+    else if (this.performanceSamples.recoverySeconds >= 5) next = this.performanceTier === "critical" ? "low" : "normal";
     if (next !== this.performanceTier) {
       this.performanceTier = next;
       this.effects.maxParticles = this.getPerformanceLimits().particles;
+      this.enforceSoftCaps();
+      this.performanceSamples = { lowSeconds: 0, criticalSeconds: 0, recoverySeconds: 0 };
       this.resizeSoon();
     }
   }
@@ -4669,17 +4867,18 @@ class Game {
     if (this.hud.elements.languageButton) this.hud.elements.languageButton.textContent = this.lang === "vi" ? "VI | EN" : "EN | VI";
     if (this.hud.elements.orientationHint) this.hud.elements.orientationHint.textContent = t("orientation");
     for (const label of document.querySelectorAll("[data-i18n]")) label.textContent = t(label.dataset.i18n);
+    this.audio.updateButton();
     this.hud.update(this);
   }
 
   activateThunder() {
     const player = this.player;
     if (player.thunderCooldown > 0) {
-      this.effects.message(`Cooldown: ${Math.ceil(player.thunderCooldown)}s`);
+      this.effects.message(t("thunder.cooldown", { seconds: Math.ceil(player.thunderCooldown) }));
       return false;
     }
     if (player.energy < BALANCE.thunder.cost) {
-      this.effects.message("Thunder Not Ready");
+      this.effects.message(t("thunder.noEnergy"));
       return false;
     }
     const radius = BALANCE.thunder.radius + player.stats.thunderRadius;
@@ -4690,7 +4889,7 @@ class Game {
     player.energy = 0;
     player.thunderCooldown = player.stats.thunderCooldown;
     this.shake = Math.min(this.mobile ? 13 : 30, this.shake + (this.mobile ? 10 : 24));
-    this.enemyBullets.length = 0;
+    this.clearEnemyBullets();
 
     for (let i = targets.length - 1; i >= 0; i--) {
       const enemy = targets[i];

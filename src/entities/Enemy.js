@@ -1,4 +1,3 @@
-import { Bullet } from "./Bullet.js";
 import { ENEMY_TYPES } from "../data/enemies.js";
 import { BALANCE } from "../data/balance.js";
 
@@ -47,7 +46,8 @@ export class Enemy {
 
     this.fireTimer -= dt;
     if (this.fireTimer <= 0 && this.y > 35) {
-      this.fire(game);
+      const load = game.enemyBullets.length / game.getPerformanceLimits().enemyBullets;
+      if (load < 0.8 || Math.random() > (load - 0.8) * 4) this.fire(game);
       const mobileFireScale = game.mobile ? BALANCE.mobile.hunterFireScale : 1;
       const bulletLoad = game.enemyBullets.length / game.getPerformanceLimits().enemyBullets;
       const loadScale = bulletLoad > 0.85 ? 1.35 : bulletLoad > 0.7 ? 1.16 : 1;
@@ -56,9 +56,9 @@ export class Enemy {
 
     if (this.config.carrier && this.y > 40) {
       this.carrierTimer -= dt;
-      if (this.carrierTimer <= 0 && game.enemies.length < (game.mobile ? 18 : 28)) {
-        game.enemies.push(new Enemy("scout", this.x - 28, this.y + 18, 2, { vx: -36, vy: 160 }));
-        game.enemies.push(new Enemy("scout", this.x + 28, this.y + 18, 2, { vx: 36, vy: 160 }));
+      if (this.carrierTimer <= 0 && game.enemies.length < game.getPerformanceLimits().enemies - 2) {
+        game.addEnemy("scout", this.x - 28, this.y + 18, 2, { vx: -36, vy: 160 });
+        game.addEnemy("scout", this.x + 28, this.y + 18, 2, { vx: 36, vy: 160 });
         this.carrierTimer = game.mobile ? 5.1 : 4.2;
       }
     }
@@ -70,13 +70,14 @@ export class Enemy {
       return;
     }
     if (this.config.bulletMode === "none") return;
+    if (game.enemyBullets.length >= game.getPerformanceLimits().enemyBullets) return;
     if (this.config.sniper) {
       const dx = game.player.x - this.x;
       const dy = game.player.y - this.y;
       const base = Math.atan2(dy, dx);
       const speed = 360 * (game.mobile ? BALANCE.mobile.enemyBulletScale : 1);
       game.effects.indicator(game.player.x, game.player.y - 44, "SHOT", 0.8, "#9fe8ff");
-      game.enemyBullets.push(new Bullet({
+      game.addEnemyBullet({
         x: this.x,
         y: this.y + this.r,
         vx: Math.cos(base) * speed,
@@ -87,7 +88,7 @@ export class Enemy {
         owner: "enemy",
         color: "#9fe8ff",
         shape: "beam"
-      }));
+      });
       return;
     }
     const angles = this.config.bulletMode === "spread" ? [-0.22, 0, 0.22] : [0];
@@ -97,7 +98,7 @@ export class Enemy {
       const base = Math.atan2(dy, dx) + offset;
       const speedScale = game.mobile ? BALANCE.mobile.enemyBulletScale : 1;
       const speed = (this.config.miniBoss ? 230 : this.config.bulletMode === "spread" ? 205 : 185) * speedScale;
-      game.enemyBullets.push(new Bullet({
+      if (!game.addEnemyBullet({
         x: this.x,
         y: this.y + this.r,
         vx: Math.cos(base) * speed,
@@ -107,7 +108,7 @@ export class Enemy {
         life: 4,
         owner: "enemy",
         color: this.type === "shooter" ? "#c58cff" : "#ff6a4f"
-      }));
+      })) break;
     }
   }
 
@@ -135,7 +136,7 @@ export class Enemy {
 
     this.fireTimer -= dt;
     if (this.fireTimer <= 0) {
-      this.fireHunter(game);
+      if (game.enemyBullets.length < game.getPerformanceLimits().enemyBullets * 0.8) this.fireHunter(game);
       const enraged = this.hp < this.maxHp * 0.4;
       this.fireTimer = (enraged ? 0.72 : 1.15) / this.fireRateScale;
     }
@@ -143,8 +144,8 @@ export class Enemy {
     this.summonTimer -= dt;
     if (this.summonTimer <= 0) {
       game.warn("Hunter Summon");
-      game.enemies.push(new Enemy("shooter", Math.max(35, this.x - 95), this.y + 30, 4, { vx: -42, vy: 118 }));
-      game.enemies.push(new Enemy("shooter", Math.min(game.width - 35, this.x + 95), this.y + 30, 4, { vx: 42, vy: 118 }));
+      game.addEnemy("shooter", Math.max(35, this.x - 95), this.y + 30, 4, { vx: -42, vy: 118 });
+      game.addEnemy("shooter", Math.min(game.width - 35, this.x + 95), this.y + 30, 4, { vx: 42, vy: 118 });
       this.summonTimer = 8.5;
     }
 
@@ -176,7 +177,7 @@ export class Enemy {
       const t = count === 1 ? 0 : i / (count - 1) - 0.5;
       const angle = base + t * spread;
       const speed = (enraged ? 245 : 215) * (game.mobile ? BALANCE.mobile.enemyBulletScale : 1);
-      game.enemyBullets.push(new Bullet({
+      if (!game.addEnemyBullet({
         x: this.x,
         y: this.y + this.r * 0.6,
         vx: Math.cos(angle) * speed,
@@ -186,7 +187,7 @@ export class Enemy {
         life: 4.4,
         owner: "enemy",
         color: "#77e7ff"
-      }));
+      })) break;
     }
   }
 
@@ -196,7 +197,7 @@ export class Enemy {
     return this.hp <= 0;
   }
 
-  draw(ctx) {
+  draw(ctx, game = null) {
     ctx.save();
     ctx.translate(this.x, this.y);
     const s = this.r / 23;
@@ -244,7 +245,7 @@ export class Enemy {
     if (this.config.shieldAura) {
       ctx.save();
       ctx.scale(1 / s, 1 / s);
-      ctx.strokeStyle = "rgba(127,255,208,0.35)";
+      ctx.strokeStyle = game?.performanceTier === "critical" ? "rgba(127,255,208,0.16)" : "rgba(127,255,208,0.35)";
       ctx.lineWidth = 3;
       ctx.beginPath();
       ctx.arc(0, 0, 104, 0, Math.PI * 2);

@@ -2162,3 +2162,66 @@ Cap nhat ngay 07/06/2026 theo yeu cau trong `pasted-text.txt`.
 - Doi VI/EN tai menu, luc dang choi, pause, game over va victory.
 - Playtest Endless sau 3 phut de danh gia cap enemy/bullet va do kho.
 - Kiem tra Android Chrome va iPhone Safari de dam bao Control Dock an, nut mobile khong bi che.
+
+## 34. Bugfix Runtime Sau Playtest
+
+Cap nhat ngay 07/06/2026 theo yeu cau trong file TXT bugfix moi.
+
+### Nguyen Nhan Thuc Te
+
+- Lag van con vi tier cu chi giam mot phan effect, trong khi bullet, particle va power-up van tao bang `new` lien tuc.
+- `Game.updateEntities()` va `EffectsSystem.update()` dung `.filter()` de tao mang moi moi frame, gay them garbage collection khi man hinh dong.
+- `Bullet.draw()` van tao radial gradient va dung `lighter` cho moi bullet ke ca khi tier thap.
+- Wave, carrier va boss summon van co duong spawn co the vuot cap tam thoi.
+- Tieng Viet mat dau vi chinh cac chuoi trong `src/data/i18n.js` duoc viet khong dau, khong phai do loi charset.
+- Pointer mat dieu khien vi `blur` xoa pointer id/fire state, khong co `mousemove` fallback va khong luu day du trang thai drag/target cuoi.
+
+### Sua Hieu Nang
+
+- Them pool tai su dung cho `Bullet`, `Particle` va `PowerUp`.
+- Tat ca duong tao player/enemy bullet di qua `Game.addPlayerBullet()` va `Game.addEnemyBullet()` de chan truoc khi vuot cap.
+- Power-up di qua `Game.addPowerUp()` va duoc tra ve pool khi het life hoac duoc nhat.
+- Thay `.filter()` moi frame bang compact array in-place trong `Game` va `EffectsSystem`.
+- Hard cap desktop:
+  - Normal: 140 player bullet, 180 enemy bullet, 180 particle, 32 enemy, 14 power-up.
+  - Low: 100, 130, 110, 24, 10.
+  - Critical: 70, 90, 60, 18, 8.
+- Mobile dung 75% cap desktop.
+- Enemy bo/giam luot ban khi enemy bullet vuot 80% cap; khong tao bullet khi da dat cap.
+- Random spawn, wave, carrier, Hunter va boss summon deu kiem tra cap enemy truoc khi tao.
+- Low/critical giam hoac tat bullet glow, particle `lighter`, power-up glow, boss/player shadow, cloud va background streak.
+- FPS debug co ca FPS tuc thoi va average FPS.
+- Average FPS duoi 45 trong 2 giay chuyen Low; duoi 32 trong 1.5 giay chuyen Critical; tren 56 trong 5 giay moi phuc hoi tier.
+- Khi doi tier, game cap object ngay va resize canvas mot lan de ap dung DPR moi.
+
+### Sua Tieng Viet
+
+- Toan bo chuoi giao dien tieng Viet trong `i18n.js` da doi sang Unicode co dau.
+- Menu, HUD, Pause, Game Over, Victory, Hangar, power-up va thong bao Thunder dung chuoi co dau.
+- HTML build co `<meta charset="UTF-8">`.
+- Build script ghi `index.html` va `Sky-Thunder-Play.html` voi encoding `utf8`.
+- Font DOM va Canvas dung stack co `Segoe UI` va `Noto Sans`.
+
+### Sua Pointer Desktop
+
+- Input luu them `pointerActive`, `pointerDown`, `dragging`, `lastPointerX`, `lastPointerY`, `lastKnownInsideViewport` va pointer id.
+- Co ca `window.pointermove` va `window.mousemove` fallback.
+- Toa do luon clamp theo kich thuoc game; khi mat focus giu target cuoi thay vi reset/dua player ve giua.
+- Khi con tro quay lai, mouse/pointer event tiep tuc cap nhat target.
+- Pause, Thunder, Language va Sound dung `preventDefault()` + `stopPropagation()` de khong doi target player.
+- CSS van khoa overflow, overscroll, touch action va user select.
+
+### Test Da Chay
+
+- Tat ca lenh `node --check` bat buoc: pass.
+- `node tools/build-standalone.js`: pass.
+- Static check output xac nhan co UTF-8, tieng Viet co dau, pool/cap/tier, pointermove/mousemove, Control Dock va language switch.
+- Chrome headless mo `index.html` thanh cong, JavaScript khoi tao HUD/menu va localization.
+- Screenshot desktop 1280x800 xac nhan text co dau, Control Dock va nut Sound/Language khong chong nhau.
+
+### Chua The Tu Dong Playtest
+
+- Headless browser khong mo phong duoc con tro roi khoi cua so Windows xuong taskbar.
+- Can test tay Chrome/Edge: giu chuot trai, keo xuong taskbar, quay lai canvas va keo qua hai canh.
+- Can test 3 phut stage dong/Endless bang F3 tren may that de danh gia FPS sau pooling.
+- Can test Android Chrome va iPhone Safari tren thiet bi that.

@@ -1,4 +1,3 @@
-import { Enemy } from "../entities/Enemy.js";
 import { BALANCE } from "../data/balance.js";
 
 export class SpawnSystem {
@@ -38,7 +37,7 @@ export class SpawnSystem {
     const type = stage.enemies[Math.floor(Math.random() * stage.enemies.length)];
     const r = 32;
     const x = r + Math.random() * (this.game.width - r * 2);
-    this.game.enemies.push(new Enemy(type, x, -44, stage.id));
+    this.game.addEnemy(type, x, -44, stage.id);
   }
 
   updateWaves(stage) {
@@ -53,6 +52,8 @@ export class SpawnSystem {
   }
 
   spawnWave(stage, wave) {
+    const load = this.game.enemies.length / this.game.getPerformanceLimits().enemies;
+    if (load >= 1 || (load > 0.8 && wave.pattern !== "miniBoss")) return;
     const dangerous = wave.danger || ["sides", "wall", "rain", "ambush", "elite"].includes(wave.pattern) || wave.type === "tank" || wave.type === "shooter" || (wave.count || 0) >= 6;
     if (dangerous && wave.pattern !== "miniBoss") {
       this.game.warn("Danger Wave");
@@ -72,7 +73,7 @@ export class SpawnSystem {
     const count = this.mobileCount(wave.count || 5);
     const gap = this.game.width / (count + 1);
     for (let i = 0; i < count; i++) {
-      this.game.enemies.push(new Enemy(wave.type, gap * (i + 1), -45 - i * 12, stage.id, { vy: 105 + stage.id * 12 }));
+      this.game.addEnemy(wave.type, gap * (i + 1), -45 - i * 12, stage.id, { vy: 105 + stage.id * 12 });
     }
   }
 
@@ -82,7 +83,7 @@ export class SpawnSystem {
     for (let i = 0; i < count; i++) {
       const offset = (i - (count - 1) / 2) * 58;
       const depth = Math.abs(i - (count - 1) / 2) * 28;
-      this.game.enemies.push(new Enemy(wave.type, center + offset, -50 - depth, stage.id, { vy: 118 + stage.id * 10 }));
+      this.game.addEnemy(wave.type, center + offset, -50 - depth, stage.id, { vy: 118 + stage.id * 10 });
     }
   }
 
@@ -92,13 +93,13 @@ export class SpawnSystem {
       const left = i % 2 === 0;
       const x = left ? 28 : this.game.width - 28;
       const vx = left ? 95 : -95;
-      this.game.enemies.push(new Enemy(wave.type, x, -45 - i * 18, stage.id, { vx, vy: 120 + stage.id * 8 }));
+      this.game.addEnemy(wave.type, x, -45 - i * 18, stage.id, { vx, vy: 120 + stage.id * 8 });
     }
   }
 
   spawnMiniBoss(stage, wave) {
     const type = wave.type || "warden";
-    this.game.enemies.push(new Enemy(type, this.game.width / 2, -80, stage.id, { vx: 0, vy: 52 }));
+    this.game.addEnemy(type, this.game.width / 2, -80, stage.id, { vx: 0, vy: 52 });
     this.game.warn("Mini Boss Incoming");
   }
 
@@ -161,7 +162,7 @@ export class SpawnSystem {
       fireRateScale: difficulty.fireRateScale,
       scoreScale: difficulty.scoreScale
     } : {};
-    this.game.enemies.push(new Enemy(type, x, y, stageId, { ...scaled, ...options }));
+    this.game.addEnemy(type, x, y, stageId, { ...scaled, ...options });
   }
 
   updateEndless(dt) {
@@ -187,13 +188,13 @@ export class SpawnSystem {
 
     if (this.endlessMiniBossTimer <= 0) {
       this.game.warn("Endless Mini Boss");
-      this.game.enemies.push(new Enemy("warden", this.game.width / 2, -90, 6, {
+      this.game.addEnemy("warden", this.game.width / 2, -90, 6, {
         vx: 0,
         vy: 48 + difficulty.minutes * 2,
         hpScale: difficulty.hpScale,
         fireRateScale: difficulty.fireRateScale,
         scoreScale: difficulty.scoreScale
-      }));
+      });
       this.endlessMiniBossTimer = Math.max(this.game.mobile ? 34 : 24, 42 - difficulty.minutes * 2);
     }
   }
@@ -219,12 +220,12 @@ export class SpawnSystem {
     const type = types[Math.floor(Math.random() * types.length)];
     const r = 32;
     const x = r + Math.random() * (this.game.width - r * 2);
-    this.game.enemies.push(new Enemy(type, x, -44, 6, {
+    this.game.addEnemy(type, x, -44, 6, {
       hpScale: difficulty.hpScale,
       speedScale: difficulty.speedScale,
       fireRateScale: difficulty.fireRateScale,
       scoreScale: difficulty.scoreScale
-    }));
+    });
   }
 
   spawnEndlessWave(difficulty) {
@@ -249,12 +250,12 @@ export class SpawnSystem {
     const count = this.mobileCount(wave.count || 6);
     for (let i = 0; i < count; i++) {
       const x = ((i + 1) / (count + 1)) * this.game.width;
-      this.game.enemies.push(new Enemy(wave.type, x, -45 - i * 10, stage.id, {
+      this.game.addEnemy(wave.type, x, -45 - i * 10, stage.id, {
         hpScale: difficulty.hpScale,
         speedScale: difficulty.speedScale,
         fireRateScale: difficulty.fireRateScale,
         scoreScale: difficulty.scoreScale
-      }));
+      });
     }
   }
 
@@ -265,13 +266,13 @@ export class SpawnSystem {
       const side = i % 2 === 0 ? -1 : 1;
       const row = Math.floor(i / 2) + 1;
       const x = center + side * row * 48;
-      this.game.enemies.push(new Enemy(wave.type, x, -45 - row * 24, stage.id, {
+      this.game.addEnemy(wave.type, x, -45 - row * 24, stage.id, {
         vx: side * 18,
         hpScale: difficulty.hpScale,
         speedScale: difficulty.speedScale,
         fireRateScale: difficulty.fireRateScale,
         scoreScale: difficulty.scoreScale
-      }));
+      });
     }
   }
 
@@ -279,13 +280,13 @@ export class SpawnSystem {
     const count = this.mobileCount(wave.count || 6);
     for (let i = 0; i < count; i++) {
       const left = i % 2 === 0;
-      this.game.enemies.push(new Enemy(wave.type, left ? -24 : this.game.width + 24, -40 - i * 22, stage.id, {
+      this.game.addEnemy(wave.type, left ? -24 : this.game.width + 24, -40 - i * 22, stage.id, {
         vx: left ? 76 : -76,
         vy: (120 + i * 3) * difficulty.speedScale,
         hpScale: difficulty.hpScale,
         fireRateScale: difficulty.fireRateScale,
         scoreScale: difficulty.scoreScale
-      }));
+      });
     }
   }
 

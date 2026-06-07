@@ -2,7 +2,11 @@ export class Input {
   constructor(canvas) {
     this.canvas = canvas;
     this.keys = new Set();
-    this.pointer = { x: 0, y: 0, active: false, fire: false, id: null };
+    this.pointer = {
+      x: 0, y: 0, active: false, fire: false, id: null,
+      pointerActive: false, pointerDown: false, dragging: false,
+      lastPointerX: 0, lastPointerY: 0, lastKnownInsideViewport: true
+    };
     this.mobile = false;
     this.skillRequested = false;
     this.autoFire = true;
@@ -36,6 +40,9 @@ export class Input {
     window.addEventListener("pointermove", (event) => {
       if (this.pointer.active && this.pointer.id === event.pointerId) this.setPointer(event, false);
     }, { passive: false });
+    window.addEventListener("mousemove", (event) => {
+      if (!this.mobile && this.pointer.dragging) this.setMousePointer(event);
+    }, { passive: false });
     this.canvas.addEventListener("pointerdown", (event) => {
       if (event.button === 2 && !this.mobile) {
         event.preventDefault();
@@ -59,7 +66,10 @@ export class Input {
     }, { passive: false });
     window.addEventListener("pointercancel", (event) => {
       this.releasePointer(event);
-      if (this.pointer.id === event.pointerId) this.resetPointer();
+      if (this.pointer.id === event.pointerId) this.preserveLastTarget();
+    }, { passive: false });
+    window.addEventListener("mouseup", (event) => {
+      if (event.button === 0) this.resetPointer();
     }, { passive: false });
     window.addEventListener("touchmove", (event) => {
       if (!event.target.closest?.(".menu")) event.preventDefault();
@@ -69,12 +79,12 @@ export class Input {
       if (this.pointer.active || event.target === this.canvas) event.preventDefault();
     });
     window.addEventListener("blur", () => {
-      this.pointer.fire = false;
+      this.preserveLastTarget();
       this.pointer.id = null;
       this.justActivated = false;
     });
     document.addEventListener("visibilitychange", () => {
-      if (document.hidden) this.resetPointer();
+      if (document.hidden) this.preserveLastTarget();
     });
   }
 
@@ -91,18 +101,53 @@ export class Input {
     event.preventDefault();
     if (this.pointer.id !== null && this.pointer.id !== event.pointerId) return;
     this.pointer.active = true;
+    this.pointer.pointerActive = true;
     this.pointer.id = event.pointerId;
     this.pointer.fire = fire || this.pointer.fire;
-    const viewport = this.viewport();
-    this.pointer.x = Math.max(0, Math.min(viewport.width, event.clientX));
-    this.pointer.y = Math.max(0, Math.min(viewport.height, event.clientY));
+    this.pointer.pointerDown = fire || this.pointer.pointerDown;
+    this.pointer.dragging = fire || this.pointer.dragging;
+    this.updateClampedPosition(event.clientX, event.clientY);
     if (fire) this.justActivated = true;
+  }
+
+  setMousePointer(event) {
+    event.preventDefault();
+    if (!this.pointer.dragging) return;
+    if (event.buttons === 0 && document.hasFocus()) {
+      this.resetPointer();
+      return;
+    }
+    this.pointer.active = true;
+    this.pointer.pointerActive = true;
+    this.pointer.fire = true;
+    this.pointer.pointerDown = true;
+    this.updateClampedPosition(event.clientX, event.clientY);
+  }
+
+  updateClampedPosition(clientX, clientY) {
+    const viewport = this.viewport();
+    this.pointer.lastKnownInsideViewport = clientX >= 0 && clientX <= viewport.width && clientY >= 0 && clientY <= viewport.height;
+    this.pointer.x = Math.max(0, Math.min(viewport.width, clientX));
+    this.pointer.y = Math.max(0, Math.min(viewport.height, clientY));
+    this.pointer.lastPointerX = this.pointer.x;
+    this.pointer.lastPointerY = this.pointer.y;
+  }
+
+  preserveLastTarget() {
+    if (!this.pointer.dragging) return;
+    this.pointer.active = true;
+    this.pointer.pointerActive = true;
+    this.pointer.x = this.pointer.lastPointerX;
+    this.pointer.y = this.pointer.lastPointerY;
   }
 
   resetPointer() {
     this.pointer.active = false;
+    this.pointer.pointerActive = false;
     this.pointer.fire = false;
     this.pointer.id = null;
+    this.pointer.pointerDown = false;
+    this.pointer.dragging = false;
     this.justActivated = false;
   }
 
